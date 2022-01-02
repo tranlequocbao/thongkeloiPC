@@ -188,7 +188,7 @@ namespace QC
         }
         private void load_item()
         {
-
+            
             load_error(itemlocal.Shop);
             load_4M();
             load_shop();
@@ -201,14 +201,14 @@ namespace QC
             tbVin.Text = itemlocal.Vincode;
             tbModel.Text = itemlocal.Model;
             tbAmount.Text = itemlocal.Amount.ToString();
-            cbType.SelectedItem = itemlocal.Type;
+            cbType.SelectedItem =Username.gettypeError(itemlocal.Type);
             tbDesc.Text = itemlocal.Descript;
-            cb4M.SelectedItem = itemlocal.T4M;
-            cbShop.SelectedItem = itemlocal.Shop;
-            cbLevel.SelectedItem = itemlocal.level;
+            cb4M.SelectedItem = Username.get4M(itemlocal.T4M);
+            cbShop.SelectedItem = Username.getShopError(itemlocal.Shop);
+            cbLevel.SelectedItem = Username.getLevelError(itemlocal.level);
             cbDefect.SelectedItem = itemlocal.Timedetect;
             cbProduct.SelectedItem = itemlocal.TimeProduct;
-            cbPosition.SelectedItem = itemlocal.Position;
+            cbPosition.SelectedItem = Username.getPositionError(itemlocal.Position);
             string posit = itemlocal.Position;
             tb4m.Text = itemlocal.Human;
             tbNote.Text = itemlocal.Note;
@@ -216,9 +216,10 @@ namespace QC
             tbSolution.Text = get_solution(itemlocal.IDError);
             lbContract.Text = itemlocal.Contract_no;
             tbLot.Content = itemlocal.LOT;
-            cbMandf.SelectedItem = itemlocal.Kindman;
+            cbMandf.SelectedItem = Username.getMandfError(itemlocal.Kindman);
             cbReport.IsChecked = load_checkReport(itemlocal.IDError);
-
+            cbStation.SelectedItem = Username.getStationError(itemlocal.Station);
+            cbSection.SelectedItem = Username.getSectionError(itemlocal.Section);
 
         }
         private void load_level()
@@ -310,6 +311,8 @@ namespace QC
             }
             return result;
         }
+       
+       
         private string get_string(string s)
         {
             string result = "";
@@ -332,6 +335,7 @@ namespace QC
                             itemlocal.Type = read["TYPE_ERROR"].ToString();
                             itemlocal.Descript = read["DESC_ERROR"].ToString();
                             itemlocal.T4M = read["M4M"].ToString();
+
                             itemlocal.Shop = read["SHOP"].ToString();
                             itemlocal.Section = read["SECTION"].ToString();
                             itemlocal.Station = read["STATION"].ToString();

@@ -175,11 +175,11 @@ namespace QC
                 "from QTSX.dbo.QC_INFOMATION_PROBLEMS where DATETIME  BETWEEN '" + Convert.ToDateTime(cbbDateStart.SelectedDate.Value.ToString()).ToString("MM-dd-yyyy 00:00:00") + "' AND '" + Convert.ToDateTime(cbbDateEnd.SelectedDate.Value.ToString()).ToString("MM-dd-yyyy 23:59:59") + "'";
             if (cbbShop.SelectedValue.ToString() != "ALL")
             {
-                cbb1_shop = string.Format(" AND SHOP=N'" + cbbShop.SelectedValue.ToString() + "' ");
+                cbb1_shop = string.Format(" AND SHOP=N'" + Username.getIdShopError(cbbShop.SelectedValue.ToString()) + "' ");
             }
             if (cbbType.SelectedValue.ToString() != "ALL")
             {
-                type_error = "AND TYPE_ERROR=N'" + cbbType.SelectedValue.ToString() + "' ";
+                type_error = "AND TYPE_ERROR=N'" +Username.gettIdTypeError( cbbType.SelectedValue.ToString()) + "' ";
             }
             if (cbbModel.SelectedValue.ToString() != "ALL")
             {
@@ -223,25 +223,25 @@ namespace QC
                             Vincode = read["VIN_CODE"].ToString(),
                             Model = read["MODEL"].ToString(),
                             Date = read["DATETIME"].ToString(),
-                            Shop = read["SHOP"].ToString(),
-                            Section = read["SECTION"].ToString(),
-                            Station = read["STATION"].ToString(),
-                            Position = read["POSITION"].ToString(),
+                            Shop =Username.getShopError( read["SHOP"].ToString()),
+                            Section =Username.getSectionError( read["SECTION"].ToString()),
+                            Station = Username.getStationError( read["STATION"].ToString()),
+                            Position =Username.getPositionError( read["POSITION"].ToString()),
                             Amount = Convert.ToInt32(read["AMOUNT_ERROR"].ToString()),
-                            Type = read["TYPE_ERROR"].ToString(),
+                            Type = Username.gettypeError( read["TYPE_ERROR"].ToString()),
                             Descript = read["DESC_ERROR"].ToString(),
                             Human = read["RESPON"].ToString(),
                             Timedetect = read["DETECT_TIME"].ToString(),
                             TimeProduct = read["PRODUCT_TIME"].ToString(),
                             LOT = read["LOT"].ToString(),
-                            T4M = read["M4M"].ToString(),
+                            T4M =Username.get4M( read["M4M"].ToString()),
                             Cause = read["CAUSE"].ToString(),
                             Solution = read["SOLUTED"].ToString(),
                             Note = read["NOTE"].ToString(),
-                            Kindman = read["KINDMAN"].ToString(),
+                            Kindman =Username.getMandfError( read["KINDMAN"].ToString()),
                             Report = read["Report"].ToString(),
                             Contract_no = read["CONTRACT_NO"].ToString(),
-                            level = read["LEVEL"].ToString()
+                            level =Username.getLevelError( read["LEVEL"].ToString()),
 
                         });
 
