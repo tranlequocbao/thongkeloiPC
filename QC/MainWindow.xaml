@@ -1,0 +1,89 @@
+﻿<Window x:Class="QC.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QC"
+        xmlns:Material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="MAIN PAGE" Height="720" Width="1366" Icon="icon.ico" FontFamily="Tahoma" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="25"/>
+            <!--<RowDefinition Height="*"/>-->
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Background="#FF0404C5" MouseDown="Grid_MouseDown">
+            <!--<Border CornerRadius="20" Height="40" Width="60" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="2,0,0,0" Background="#FFFF99">
+                <TextBlock FontFamily="Tahoma" FontSize="15" Text="THACO" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Blue" FontWeight="Bold"/>
+            </Border>-->
+            <!--<Border CornerRadius="0" Height="40"  BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="70,5,0,5" Width="auto">-->
+            <TextBlock x:Name="title" Text="Copyright © 2020 by IT Administrator Dept - Thaco Mazda" HorizontalAlignment="Left" Margin="10,2,0,5" VerticalAlignment="Center" Foreground="White" FontFamily="Tahoma" FontSize="13" FontWeight="Bold" Height="auto"/>
+            <!--</Border>-->
+            <!--<Border Name="bdName" Visibility="Hidden" CornerRadius="20" Height="40" BorderBrush="White" Background="White" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,50,0">
+                <Grid>
+                    <Material:PackIcon Kind="UserCircle" HorizontalAlignment="Right" VerticalAlignment="Center" Height="40" Width="40" Foreground="Blue"/>
+                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" TextAlignment="Right" Margin="10,0,45,0" Name="txtUser" FontFamily="Tahoma" FontSize="14" FontWeight="ExtraLight" Foreground="Black"/>
+                </Grid>
+            </Border>-->
+            <!--<StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
+                <Material:PopupBox HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" PlacementMode="BottomAndAlignRightEdges" StaysOpen="False" Foreground="White">
+                    <StackPanel Width="150">
+                        <StackPanel.Background>
+                            <SolidColorBrush Color="#FF0404C5" Opacity="0.5"/>
+                        </StackPanel.Background>
+                        --><!--<Button Name="btnSetting" Click="" Content="Cài đặt" Height="30" FontFamily="Tahoma" FontSize="14" VerticalContentAlignment="Center" FontWeight="DemiBold" Foreground="White"/>
+                        <Separator Background="White" />
+                        <Button Name="btnLogout" Click="" Content="Đăng xuất" Height="30" FontFamily="Tahoma" FontSize="14" VerticalContentAlignment="Center" FontWeight="DemiBold" Foreground="White"/>
+                        <Separator Background="White" />--><!--
+                        <Button Name="btnShutdown" Content="Thoát" Click="btnShutdown_Click" Height="30" FontFamily="Tahoma" FontSize="14" VerticalContentAlignment="Center" FontWeight="DemiBold" Foreground="White"/>
+                    </StackPanel>--><!--
+                </Material:PopupBox>
+            </StackPanel>-->
+        </Grid>
+        <!--<Grid Grid.Column="1" Grid.Row="1" Background="#FFFFFCD6">
+            <TextBlock Name="lblForm" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" FontFamily="Tahoma" FontSize="18" FontWeight="DemiBold"/>
+        </Grid>-->
+        <Grid Grid.Column="0" Grid.Row="0"  Background="White" Height="500" VerticalAlignment="Top" Width="50">
+            <Button Name="btnList" Click="btnList_Click" Background="Transparent" BorderBrush="Transparent" Height="70" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top" ToolTip="Danh sách lỗi/ Error List" FontFamily="Tahoma" FontSize="14">
+                <Material:PackIcon Kind="ClipboardList" Height="50" Width="50" Foreground="Gray"/>
+            </Button>
+            
+            <Button Name="btnSearch" Click="btnSearch_Click" Background="Transparent" BorderBrush="Transparent" Height="70" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,70,0,0" ToolTip="Nhập thông tin / Input Information" FontFamily="Tahoma" FontSize="14">
+                <Material:PackIcon Kind="Import" Height="50" Width="50" Foreground="Gray"/>
+            </Button>
+            <Button Name="btnDiagram" Click="btnDiagram_Click" Background="Transparent" BorderBrush="Transparent" Height="70" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,140,0,0" ToolTip="Thống kê/ Statistic" FontFamily="Tahoma" FontSize="14">
+                <Material:PackIcon Kind="GoogleAnalytics" Height="50" Width="50" Foreground="Gray"/>
+            </Button>
+            <Button Name="btnDiagram_Shop" Click="btnDiagram_Shop_Click" Background="Transparent" BorderBrush="Transparent" Height="70" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,210,0,0" ToolTip="Thống kê/ Statistic" FontFamily="Tahoma" FontSize="14">
+                <Material:PackIcon Kind="ChartArc" Height="50" Width="50" Foreground="Gray"/>
+            </Button>
+            <Button Name="btnDiagram_Section" Click="btnDiagram_Section_Click" Background="Transparent" BorderBrush="Transparent" Height="70" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,280,0,0" ToolTip="Thống kê/ Statistic" FontFamily="Tahoma" FontSize="14">
+                <Material:PackIcon Kind="BarChart" Height="50" Width="50" Foreground="Gray"/>
+            </Button>
+
+            <Button Name="btnSetting" Click="btnSetting_Click" Background="Transparent" BorderBrush="Transparent" Height="70" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,350,0,0" ToolTip="Thống kê/ Statistic" FontFamily="Tahoma" FontSize="14">
+                <Material:PackIcon Kind="Settings" Height="50" Width="50" Foreground="Gray"/>
+            </Button>
+            <!--<Button Name="btnReport" Click="" Background="Transparent" BorderBrush="Transparent" Height="70" Width="70" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,210,0,0" ToolTip="Báo cáo quản trị" FontFamily="Tahoma" FontSize="14">
+                <Material:PackIcon Kind="ChartArc" Height="50" Width="50" Foreground="Gray"/>
+            </Button>-->
+            <!--<Button Name="btnContact" Click="" Background="Transparent" BorderBrush="Transparent" Height="70" Width="70" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,210,0,0" ToolTip="Thông tin liên hệ" FontFamily="Tahoma" FontSize="14">
+                <Material:PackIcon Kind="InformationVariant" Height="50" Width="50" Foreground="Gray"/>
+            </Button>-->
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="0"  Background="#FFE2E0E0">
+            <DockPanel Name="dpShow" Margin="5">
+                <DockPanel.Background>
+                    <ImageBrush ImageSource="asset/hinhnen.png"/>
+                </DockPanel.Background>
+            </DockPanel>
+        </Grid>
+
+        
+    </Grid>
+</Window>

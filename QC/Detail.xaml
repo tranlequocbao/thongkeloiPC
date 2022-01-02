@@ -1,0 +1,204 @@
+﻿<Window x:Class="QC.Detail"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QC"
+        mc:Ignorable="d"
+        xmlns:Material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Building 20200807111003 - Copyright © 2020 by IT Administrator Dept - Thaco Mazda" Height="720" Width="1300" Closing="Window_Closing" Loaded="Window_Loaded" Background="White" >
+    <!--<StackPanel>-->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+            <!--<RowDefinition Height="*"/>-->
+        </Grid.RowDefinitions>
+        <!--<Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>-->
+        <!--<Image Name="img" />-->
+        <StackPanel>
+            <Label Content="CHI TIẾT THÔNG TIN LỖI" FontFamily="Cambria" FontSize="30" HorizontalAlignment="Center" FontWeight="Bold"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
+            <Grid  Margin="10,5,10,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*"/>
+
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Content="ID: " FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox  Text="" IsEnabled="False" VerticalContentAlignment="Center" Grid.Row="0" x:Name="tbID" Grid.Column="1" Margin="5,0,5,5" MinWidth="200" MaxWidth="250" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Left" Background="Transparent" />
+
+                <Label Content="Vin: "  Grid.Row="0" Grid.Column="1" FontFamily="Cambria" FontSize="20" Margin="220,0,200,0" VerticalAlignment="Center" HorizontalAlignment="Right" VerticalContentAlignment="Center" />
+                <TextBox Grid.Row="0" x:Name="tbVin"   Grid.Column="1" Margin="260,0,5,5" BorderThickness="2" FontFamily="Cambria" Width="200" MaxWidth="300" FontSize="18" HorizontalAlignment="Right"  Text="" VerticalContentAlignment="Center" Background="Transparent" Height="auto"/>
+                <Label Content="Loại xe: " Grid.Row="1" Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox IsReadOnly="True" Grid.Row="1" x:Name="tbModel" Text=""  Grid.Column="1" Width="200" MinWidth="200" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Left"  Background="Transparent" Height="auto" VerticalContentAlignment="Center"/>
+
+                <Label Content="Contract No: " Grid.Row="1"  Grid.Column="1" FontFamily="Cambria" FontSize="20" Margin="200,0,170,0"  VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <TextBox Grid.Row="1" IsReadOnly="True" x:Name="lbContract"  MaxWidth="80"  Grid.Column="1" Margin="200,0,100,0" HorizontalContentAlignment="Center" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Right" Background="Transparent" Height="auto" VerticalContentAlignment="Center"/>
+
+                <Label Content="Lot: " Grid.Row="1"  Grid.Column="1" FontFamily="Cambria" FontSize="20" Margin="200,0,40,0"  VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <Label Grid.Row="1" Content="059" x:Name="tbLot"  MinWidth="50" MaxWidth="50"  Grid.Column="1" Margin="200,0,0,0" HorizontalContentAlignment="Center" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Right" Background="Transparent" Height="auto" VerticalContentAlignment="Center"/>
+
+                <Label Content="TG P/hiện: " Grid.Row="2" Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Grid.Row="2" x:Name="cbDefect"  Width="150" Text="" Grid.Column="1" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Left" Background="Transparent" Height="auto" VerticalContentAlignment="Center"/>
+
+                <Label Content="TG S/xuất: " Grid.Row="2" Grid.Column="1" FontFamily="Cambria" FontSize="20" Margin="180,0,175,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <ComboBox Grid.Row="2" x:Name="cbProduct"  Width="150"   Text="" Grid.Column="1" Margin="250,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Right" Background="Transparent" Height="auto" VerticalContentAlignment="Center"/>
+
+
+
+
+                <Label Content="Số lượng lỗi: " Grid.Row="3" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox Grid.Row="3" Text="" x:Name="tbAmount"   Grid.Column="1" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Left" Background="Transparent" Width="50" Height="auto" VerticalContentAlignment="Center" />
+                <Label Content="Vị trí p/hiện: " Grid.Row="3" Grid.Column="1" FontFamily="Cambria" FontSize="20" Margin="60,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Grid.Row="3" x:Name="cbPosition"  Text=""  Grid.Column="1" Margin="180,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+
+
+                <Label Content="Loại lỗi: " Grid.Row="4" Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Grid.Row="4"  Text="" x:Name="cbType"  Grid.Column="1" Margin="5,0,5,5" VerticalContentAlignment="Center" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+                <Label Content="Mổ tả lỗi: " Grid.Row="5" Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+         ScrollViewer.VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap" SpellCheck.IsEnabled="True" Language="vi-VN" Grid.Row="5" Text="" VerticalContentAlignment="Center" x:Name="tbDesc"   Grid.Column="1" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+                <Label Content="Máy/Người: " Grid.Row="6" Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Grid.Row="6" x:Name="cb4M" VerticalContentAlignment="Center" Text="" Grid.Column="1" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Left" Width="150" Background="Transparent" Height="auto"/>
+
+                <Label Content="Trách nhiệm: " Grid.Row="6" Grid.Column="1" FontFamily="Cambria" FontSize="20" Margin="160,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox Grid.Row="6" Text="" x:Name="tb4m"  Grid.Column="1" Margin="300,0,5,5" BorderThickness="2" FontFamily="Cambria" VerticalContentAlignment="Center" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+
+                <Label Content="Kind of Man: " Grid.Row="7" Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Grid.Row="7" Text="" x:Name="cbMandf"  VerticalContentAlignment="Center" Grid.Column="1" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+
+
+                <Label Content="Xưởng: " Grid.Row="8" Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Grid.Row="8" Text="" x:Name="cbShop"  VerticalContentAlignment="Center" Grid.Column="1" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto" SelectionChanged="cbShop_SelectionChanged"/>
+                <Label Content="Tổ: " Grid.Row="9" Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Grid.Row="9" x:Name="cbSection" Text="" MaxWidth="250" MinWidth="200" VerticalContentAlignment="Center"  Grid.Column="1" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Left" Background="Transparent" Height="auto" SelectionChanged="cbSection_SelectionChanged"/>
+                <Label Content="VT: " Grid.Row="9" Grid.Column="1" FontFamily="Cambria" FontSize="20" Margin="220,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <ComboBox Grid.Row="9" x:Name="cbStation" Text="" Grid.Column="1" VerticalContentAlignment="Center" Margin="255,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+                <Grid Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                        
+                        
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Ghi chú: "  Grid.Column="0" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    <TextBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"  AcceptsReturn="True" TextWrapping="Wrap" SpellCheck.IsEnabled="True" Language="vi-VN" x:Name="tbNote" Text="" Grid.Column="1" VerticalContentAlignment="Center" Margin="5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+                    <Label Content="BC: " Grid.Column="2" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                    <CheckBox  Name="cbReport"  Grid.Column="3" FontFamily="Cambria" FontSize="20" Margin="0,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Left" Checked="CheckBox_Checked"/>
+                    <Label Content="LEVEL: "  Grid.Column="4" FontFamily="Cambria" FontSize="20" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    <ComboBox  x:Name="cbLevel" Text="" Grid.Column="5" VerticalContentAlignment="Center" Margin="5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+                </Grid>
+               
+               
+
+                <Label Content="Nguyên nhân: " Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+         ScrollViewer.VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap" SpellCheck.IsEnabled="True" Language="vi-VN" Grid.Row="0" x:Name="tbCause"   Grid.Column="3" Grid.RowSpan="2" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+                <Label Content="Giải pháp: " Grid.Row="2" Grid.Column="2" Grid.RowSpan="2" FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+         ScrollViewer.VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap" SpellCheck.IsEnabled="True" Language="vi-VN" Grid.Row="2" x:Name="tbSolution"   Grid.Column="3" Grid.RowSpan="2" Margin="5,0,5,5" BorderThickness="2" FontFamily="Cambria" FontSize="18" HorizontalAlignment="Stretch" Background="Transparent" Height="auto"/>
+                <Label Content="Hình ảnh: " Grid.Row="4" Grid.Column="2"  FontFamily="Cambria" FontSize="20" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <Border CornerRadius="5" Grid.Column="2" Grid.Row="5" Background="Blue" BorderBrush="Blue" Margin="5,5,25,5" Width="100" Height="30">
+                    <Button Grid.Column="2" Grid.Row="5"   BorderBrush="Transparent" Background="Transparent" Content="UP HÌNH 1" Name="btnUpload" Foreground="White" Height="30" VerticalAlignment="Center" Click="btnUpload_Click"></Button>
+                </Border>
+                <Border CornerRadius="6" Grid.Column="2" Grid.Row="6" Background="Blue" BorderBrush="Blue" Margin="5,5,25,5" Width="100" Height="30">
+                    <Button    BorderBrush="Transparent" Background="Transparent" Content="UP HÌNH 2" Name="btnUpload1" Foreground="White" Height="30" VerticalAlignment="Center" Click="btnUpload1_Click"></Button>
+                </Border>
+                <Border CornerRadius="5" Grid.Column="2" Grid.Row="7" Background="Blue" BorderBrush="Blue" Margin="5,5,25,5" Width="100" Height="30">
+                    <Button    BorderBrush="Transparent" Background="Transparent" Content="COPPY 1" Name="btnCoppy" Foreground="White" Height="30" VerticalAlignment="Center" Click="btnCoppy_Click"></Button>
+                </Border>
+                <Border CornerRadius="5" Grid.Column="2" Grid.Row="8" Background="Blue" BorderBrush="Blue" Margin="5,5,25,5" Width="100" Height="30">
+                    <Button    BorderBrush="Transparent" Background="Transparent" Content="COPPY 2" Name="btnCoppy1" Foreground="White" Height="30" VerticalAlignment="Top" Click="btnCoppy1_Click"></Button>
+                </Border>
+
+
+                <Border CornerRadius="5" Grid.Column="0" Grid.Row="11" Grid.ColumnSpan="4" Background="Green" BorderBrush="Blue" Margin="5,5,30,5" Width="100" Height="30">
+                    <Button   Click="btnSave_Click" BorderBrush="Transparent" Background="Transparent" Content="LƯU" Name="btnSave" Foreground="White" >
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Background" Value="Green"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="DarkGoldenrod"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Border>
+                <Button Grid.Column="3" Grid.Row="4" Name="btn_img" Grid.ColumnSpan="2" Grid.RowSpan="5" Margin="5,5,5,5" Click="btn_img_Click" Background="Transparent" BorderBrush="Transparent">
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Border Background="{TemplateBinding Background}" BorderBrush="Black" BorderThickness="0">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                    <Image Name="img" Stretch="Uniform" Margin="5,5,5,5" />
+                </Button>
+                <Button Grid.Column="3" Grid.Row="9" Name="btn_img1" Grid.ColumnSpan="2" Grid.RowSpan="4" Margin="5,5,5,5" Click="btn_img1_Click" Background="Transparent" BorderBrush="Transparent">
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Border Background="{TemplateBinding Background}" BorderBrush="Black" BorderThickness="0">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                    <Image Name="img1"  Stretch="Uniform" Margin="5,5,5,5" />
+                </Button>
+
+            </Grid>
+        </ScrollViewer>
+
+    </Grid>
+    <!--</StackPanel>-->
+</Window>

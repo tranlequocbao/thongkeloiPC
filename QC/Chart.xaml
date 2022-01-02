@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="QC.Chart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QC"
+              xmlns:Material="http://materialdesigninxaml.net/winfx/xaml/themes"
+              xmlns:LiveChar="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1200" Loaded="UserControl_Loaded">
+    <Grid Background="#FF05828F">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Name="title" Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.ColumnSpan="6" Grid.Row="0" Grid.Column="0"/>
+        <!--<Button Name="btnBody" Click="btnBody_Click" Grid.Column="0" Grid.Row="0" Background="Transparent" BorderThickness="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" Foreground="White">
+            <Grid Width="150" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Material:PackIcon Kind="RobotIndustrial" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Height="30" Width="30"/>
+                <TextBlock Text="XƯỞNG HÀN" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Tahoma" FontSize="16" Grid.Column="1" TextAlignment="Center"/>
+            </Grid>
+        </Button>
+        <Border Name="bdReportDay" Grid.Column="0" Grid.Row="1" BorderThickness="0" CornerRadius="1" Background="#FFFBFB72"/>
+        <Button Name="btnPaint"  Grid.Column="1" Grid.Row="0" Background="Transparent" BorderThickness="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" Foreground="White">
+            <Grid Width="150" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Material:PackIcon Kind="Paint" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Height="30" Width="30"/>
+                <TextBlock Text="XƯỞNG SƠN" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Tahoma" FontSize="16" Grid.Column="1" TextAlignment="Center"/>
+            </Grid>
+        </Button>
+        <Border Name="bdShare" Grid.Column="1" Grid.Row="1" BorderThickness="0" CornerRadius="1" Background="#FFFBFB72"/>
+        <Button Name="btnAssembly"   Grid.Column="2" Grid.Row="0" Background="Transparent" BorderThickness="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" Foreground="White">
+            <Grid Width="150" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Material:PackIcon Kind="Assessment" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Height="30" Width="30"/>
+                <TextBlock Text="XƯỞNG      LÁP RÁP" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Tahoma" FontSize="16" Grid.Column="1" TextAlignment="Center"/>
+            </Grid>
+        </Button>
+        <Border Name="bdShareDept" Grid.Column="2" Grid.Row="1" BorderThickness="0" CornerRadius="1" Background="#FFFBFB72"/>
+        <Button Name="btnTester"   Grid.Column="3" Grid.Row="0" Background="Transparent" BorderThickness="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" Foreground="White">
+            <Grid Width="150" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Material:PackIcon Kind="TestTube" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Height="30" Width="30"/>
+                <TextBlock Text="XƯỞNG    KIỂM ĐỊNH" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Tahoma" FontSize="16" Grid.Column="1" TextAlignment="Center"/>
+            </Grid>
+        </Button>
+        <Border Name="bdMember" Grid.Column="3" Grid.Row="1" BorderThickness="0" CornerRadius="1" Background="#FFFBFB72"/>
+        <Button Name="btnOther"   Grid.Column="4" Grid.Row="0" Background="Transparent" BorderThickness="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" Foreground="White">
+            <Grid Width="150" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Material:PackIcon Kind="Factory" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Height="30" Width="30"/>
+                <TextBlock Text="VỊ TRÍ KHÁC" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Tahoma" FontSize="16" Grid.Column="1" TextAlignment="Center"/>
+            </Grid>
+        </Button>-->
+        <!--<Border Name="bdChart" Grid.Column="4" Grid.Row="1" BorderThickness="0" CornerRadius="1" Background="#FFFBFB72"/>-->
+        <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0" Background="White">
+                <TextBlock Name="tbSoluong" Text="BIỂU ĐỒ SỐ LƯỢNG LỖI" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="Cambria" FontWeight="Black" FontSize="18"/>
+            </Grid>
+            <Grid Grid.Row="0" Grid.Column="1" Background="White">
+                <TextBlock Name="tbTile" Text="BIỂU ĐỒ TỈ LỆ LỖI" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="Cambria" FontWeight="Black" FontSize="18"/>
+            </Grid>
+            <Grid Grid.Column="0" Grid.Row="1">
+                <LiveChar:CartesianChart Name="chQc" FontFamily="Cambria" FontSize="15" Foreground="Green" Background="White"/>
+            </Grid>
+            <Grid Grid.Column="1" Grid.Row="1">
+                <LiveChar:CartesianChart Name="chQc1" FontFamily="Cambria" FontSize="15" Foreground="Green" Background="White"/>
+            </Grid>
+        </Grid>
+        
+    </Grid>
+</UserControl>

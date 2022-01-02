@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.DirectoryServices.ActiveDirectory;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace AppInPhieu
+{
+    public partial class fr_login : Form
+    {
+        string domainname = System.Configuration.ConfigurationManager.AppSettings["Domain"];
+        string namecompani = System.Configuration.ConfigurationManager.AppSettings["Company"];
+        public fr_login()
+        {
+            InitializeComponent();
+        }
+
+        private void fr_login_Load(object sender, EventArgs e)
+        {
+            txt_user.Focus();
+            lbl_d

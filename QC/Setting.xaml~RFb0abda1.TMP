@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <startup> 
+        
+    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5"/></startup>
+  <connectionStrings>
+    <add name="conn" connectionString="Server=10.40.12.6,1433;Persist Security Info=True;User ID=sa; Password=123456;MultipleActiveResultSets=true"/>
+  <add name="conn1" connectionString="Server=10.40.13.224,1433;Persist Security Info=True;User ID=sa; Password=123456;MultipleActiveResultSets=true"/>
+  </connectionStrings>
+<appSettings>
+  <add key="building" value="Building 20210223165000 -

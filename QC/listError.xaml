@@ -1,0 +1,164 @@
+﻿<UserControl x:Class="QC.listError"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QC"
+             xmlns:Design="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+              d:DesignHeight="720" d:DesignWidth="1300" Background="White ">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+            <!--<RowDefinition Height="*"/>-->
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Background="#FFFFFCD6">
+            <TextBlock FontFamily="Tahoma" FontSize="15" Text="DANH SÁCH LỖI" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold"/>
+
+        </Grid>
+        <Grid Grid.Row="1" Background="#FFFFFCD6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="160"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="160"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="160"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="160"/>
+
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="*"/>
+
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Xưởng:" Margin="5,0,5,0" Grid.Column="0" Grid.Row="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            <Border Grid.Column="1" Grid.Row="0" CornerRadius="5" Margin="5" BorderBrush="Black" BorderThickness="1">
+                <ComboBox Name="cbbShop"  Foreground="Blue" Background="Transparent" BorderBrush="Transparent" FontFamily="Tahoma" FontSize="16" VerticalContentAlignment="Center" SelectionChanged="cbbShop_SelectionChanged"/>
+            </Border>
+            <TextBlock Text="Type Err:" Margin="5,0,5,0" Grid.Column="2" Grid.Row="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            <Border Grid.Column="3" Grid.Row="0" CornerRadius="5" Margin="5" BorderBrush="Black" BorderThickness="1">
+                <ComboBox Name="cbbType"  Foreground="Blue" Background="Transparent" BorderBrush="Transparent" FontFamily="Tahoma" FontSize="16" VerticalContentAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Ngày BĐ:" Margin="5,0,5,0" Grid.Column="4" Grid.Row="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            <Border Grid.Column="5" Grid.Row="0" CornerRadius="5" Margin="5" BorderBrush="Black" BorderThickness="1">
+                <DatePicker Name="cbbDateStart"  Foreground="Blue" Background="Transparent" BorderBrush="Transparent" FontFamily="Tahoma" FontSize="16" VerticalContentAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Ngày KT:" Margin="5,0,5,0" Grid.Column="6" Grid.Row="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            <Border Grid.Column="7" Grid.Row="0" CornerRadius="5" Margin="5" BorderBrush="Black" BorderThickness="1">
+                <DatePicker Name="cbbDateEnd"  Foreground="Blue" Background="Transparent" BorderBrush="Transparent" FontFamily="Tahoma" FontSize="16" VerticalContentAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Loại xe:" Margin="5,0,5,0" Grid.Column="8" Grid.Row="0" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            <Border Grid.Column="9" Grid.Row="0" CornerRadius="5" Margin="5" BorderBrush="Black" BorderThickness="1" MinWidth="170" MaxWidth="250" HorizontalAlignment="Left">
+                <ComboBox Name="cbbModel"  Foreground="Blue"  Background="Transparent" BorderBrush="Transparent" FontFamily="Tahoma" FontSize="16" VerticalContentAlignment="Center"/>
+            </Border>
+
+        </Grid>
+
+
+        <ListView Name="lstData" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="8" Margin="5" FontFamily="Tahoma" FontSize="14" >
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <!--<EventSetter Event="MouseLeftButtonUp" Handler="ListViewItem_MouseLeftButtonUp"/>-->
+                    <Setter Property="BorderBrush" Value="Gray"></Setter>
+                    <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+                    <Setter Property="Height" Value="45"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.Resources>
+                <Style x:Key="HeaderHeight" TargetType="GridViewColumnHeader">
+                    <Setter Property="Height" Value="35"/>
+                    <Setter Property="BorderBrush" Value="#FF03517E"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Background" Value="#FF03517E"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Style>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+                <local:OrdinalConverter x:Key="OrdinalConverter" />
+
+                <DataTemplate x:Key="OrdinalColumnDataTemplate">
+                    <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem},
+                    Converter={StaticResource ResourceKey=OrdinalConverter}}" HorizontalAlignment="Right" />
+                </DataTemplate>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=HeaderHeight}">
+                    <GridViewColumn Header="STT" Width="50" CellTemplate="{StaticResource ResourceKey=OrdinalColumnDataTemplate}"/>
+                    <GridViewColumn Header="ID Lỗi" Width="150" DisplayMemberBinding="{Binding IDError}" />
+                    <GridViewColumn Header="Số VIN" Width="200" DisplayMemberBinding="{Binding Vincode}"/>
+                    <GridViewColumn Header="Số LOT" Width="80" DisplayMemberBinding="{Binding LOT}"/>
+                    <GridViewColumn Header="Loại Xe" Width="200" DisplayMemberBinding="{Binding Model}"/>
+                    <GridViewColumn Header="Ngày ghi nhận" Width="150" DisplayMemberBinding="{Binding Date}"/>
+                    <GridViewColumn Header="Xưởng" Width="120" DisplayMemberBinding="{Binding Shop}"/>
+                    <GridViewColumn Header="Tổ" Width="120" DisplayMemberBinding="{Binding Section}"/>
+                    <GridViewColumn Header="Trạm" Width="100" DisplayMemberBinding="{Binding Station}"/>
+                    <GridViewColumn Header="Giờ phát hiện" Width="100" DisplayMemberBinding="{Binding Timedetect}"/>
+                    <GridViewColumn Header="Giờ sản xuất" Width="100" DisplayMemberBinding="{Binding Timeproduct}"/>
+                    <GridViewColumn Header="Vị trí phát hiện" Width="100" DisplayMemberBinding="{Binding Position}"/>
+                    <GridViewColumn Header="SL lỗi" Width="50" DisplayMemberBinding="{Binding Amount}"/>
+                    <GridViewColumn Header="Loại Lỗi" Width="200" DisplayMemberBinding="{Binding Type}"/>
+                    <GridViewColumn Header="Mô Tả Lỗi" Width="200" DisplayMemberBinding="{Binding Descript}"/>
+                    <GridViewColumn Header="4M" Width="200" DisplayMemberBinding="{Binding T4M}"/>
+                    <GridViewColumn Header="Nguyên do lỗi" Width="200" DisplayMemberBinding="{Binding Kindman}"/>
+                    <GridViewColumn Header="Chịu TN" Width="80" DisplayMemberBinding="{Binding Human}"/>
+                    <GridViewColumn Header="Nguyên Nhân" Width="80" DisplayMemberBinding="{Binding Cause}"/>
+                    <GridViewColumn Header="Giải Pháp" Width="80" DisplayMemberBinding="{Binding Solution}"/>
+                    <GridViewColumn Header="Ghi chú" Width="80" DisplayMemberBinding="{Binding Note}"/>
+                    <GridViewColumn Header="Báo cáo" Width="80" DisplayMemberBinding="{Binding Report}"/>
+                    <GridViewColumn Header="Level" Width="80" DisplayMemberBinding="{Binding Level}"/>
+
+                </GridView>
+            </ListView.View>
+            <ListView.ContextMenu>
+                <ContextMenu FontFamily="Tahoma" FontSize="14" Foreground="Blue">
+                    <MenuItem Header="Detail" Name="show" Click="show_Click">
+                        <MenuItem.Icon>
+                            <Design:PackIcon Kind="ClipboardListOutline"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Delete" Name="Delete" Click="Delete_Click">
+                        <MenuItem.Icon>
+                            <Design:PackIcon Kind="Delete"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </ListView.ContextMenu>
+
+        </ListView>
+        <Border  Grid.Row="3" CornerRadius="3" Margin="5" BorderBrush="Green" BorderThickness="1"  MaxWidth="130" MinWidth="130" HorizontalAlignment="Right">
+            <Button Name="btnSearch"   Foreground="White" Background="Blue" BorderBrush="Transparent" FontFamily="Tahoma" Content="Search" FontSize="16" VerticalContentAlignment="Center" Click="btnSearch_Click"/>
+        </Border>
+        <Border  Grid.Row="3" CornerRadius="3" Margin="5,5,180,5" BorderBrush="Green" BorderThickness="1"  MaxWidth="130" MinWidth="130" HorizontalAlignment="Right">
+            <Button Name="btnExport"   Foreground="White" Background="Green" BorderBrush="Transparent" FontFamily="Tahoma" Content="Export" FontSize="16" VerticalContentAlignment="Center" Click="btnExport_Click"/>
+        </Border>
+
+        <TextBlock Text="BÁO CÁO:" Margin="5,0,5,0"   Grid.Row="3" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Border  Grid.Row="3" CornerRadius="5" Margin="180,5,5,5" Width="20" Height="20" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left">
+            <CheckBox Name="cbReport1"  Foreground="Blue" Background="Transparent" BorderBrush="Transparent" FontFamily="Tahoma" FontSize="16" VerticalContentAlignment="Center"/>
+        </Border>
+        <TextBlock Text="Đã BC" Margin="205,0,5,0"   Grid.Row="3" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+        <Border  Grid.Row="3" CornerRadius="5" Margin="90,5,5,5" Width="20" Height="20" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left">
+            <CheckBox Name="cbALL"  Foreground="Blue" Background="Transparent" BorderBrush="Transparent" FontFamily="Tahoma" FontSize="16" VerticalContentAlignment="Center" Checked="cbALL_Checked" Unchecked="cbALL_Unchecked"/>
+        </Border>
+        <TextBlock Text="Tất cả" Margin="115,0,5,0"   Grid.Row="3" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Text="VIN CODE" Margin="300,0,5,0"   Grid.Row="3" FontFamily="Tahoma" FontSize="16" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+        <TextBox Grid.Row="3" Width="400"   x:Name="tbSearchVIN"  Grid.Column="1" Margin="400,0,5,5" BorderThickness="2" FontFamily="Cambria" VerticalContentAlignment="Center" FontSize="18" HorizontalAlignment="Left"  Height="auto" TextChanged="OnTextBoxTextChanged" KeyUp="tbSearchVIN_KeyUp" >
+            <TextBox.Background>
+                <ImageBrush ImageSource="asset/timkiem.PNG" AlignmentX="Left" Stretch="None" />
+            </TextBox.Background>
+        </TextBox>
+
+
+
+
+    </Grid>
+</UserControl>

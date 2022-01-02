@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="QC.ChartSection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QC"
+              xmlns:Material="http://materialdesigninxaml.net/winfx/xaml/themes"
+              xmlns:LiveChar="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1200" Loaded="UserControl_Loaded">
+    <Grid Background="#FF05828F">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Name="title" Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.ColumnSpan="6" Grid.Row="0" Grid.Column="0"/>
+      
+        <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0" Background="White">
+                <TextBlock Name="tbSoluong" Text="BIỂU ĐỒ SỐ LƯỢNG LỖI" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="Cambria" FontWeight="Black" FontSize="18"/>
+            </Grid>
+            <Grid Grid.Row="0" Grid.Column="1" Background="White">
+                <TextBlock Name="tbTile" Text="BIỂU ĐỒ TỈ LỆ LỖI" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="Cambria" FontWeight="Black" FontSize="18"/>
+            </Grid>
+            <Grid Grid.Column="0" Grid.Row="1">
+                <LiveChar:CartesianChart Name="chQc" FontFamily="Cambria" FontSize="15" Foreground="Green" Background="White"/>
+            </Grid>
+            <Grid Grid.Column="1" Grid.Row="1">
+                <LiveChar:CartesianChart Name="chQc1" FontFamily="Cambria" FontSize="15" Foreground="Green" Background="White"/>
+            </Grid>
+        </Grid>
+
+    </Grid>
+</UserControl>

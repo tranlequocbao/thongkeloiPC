@@ -1,0 +1,471 @@
+rSelection(selection){if(selection.type()===LayerViewer.LayerView.Selection.Type.Snapshot){const snapshotWithRect=(selection).snapshot();snapshotWithRect.snapshot.addReference();return(Promise.resolve(snapshotWithRect));}
+if(selection.layer()){const promise=selection.layer().snapshots()[0];if(promise)
+return promise;}
+return(Promise.resolve(null));}
+_initGL(canvas){const gl=canvas.getContext('webgl');if(!gl)
+return null;gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.enable(gl.BLEND);gl.clearColor(0.0,0.0,0.0,0.0);gl.enable(gl.DEPTH_TEST);return gl;}
+_createShader(type,script){const shader=this._gl.createShader(type);this._gl.shaderSource(shader,script);this._gl.compileShader(shader);this._gl.attachShader(this._shaderProgram,shader);}
+_initShaders(){this._shaderProgram=this._gl.createProgram();this._createShader(this._gl.FRAGMENT_SHADER,LayerViewer.Layers3DView.FragmentShader);this._createShader(this._gl.VERTEX_SHADER,LayerViewer.Layers3DView.VertexShader);this._gl.linkProgram(this._shaderProgram);this._gl.useProgram(this._shaderProgram);this._shaderProgram.vertexPositionAttribute=this._gl.getAttribLocation(this._shaderProgram,'aVertexPosition');this._gl.enableVertexAttribArray(this._shaderProgram.vertexPositionAttribute);this._shaderProgram.vertexColorAttribute=this._gl.getAttribLocation(this._shaderProgram,'aVertexColor');this._gl.enableVertexAttribArray(this._shaderProgram.vertexColorAttribute);this._shaderProgram.textureCoordAttribute=this._gl.getAttribLocation(this._shaderProgram,'aTextureCoord');this._gl.enableVertexAttribArray(this._shaderProgram.textureCoordAttribute);this._shaderProgram.pMatrixUniform=this._gl.getUniformLocation(this._shaderProgram,'uPMatrix');this._shaderProgram.samplerUniform=this._gl.getUniformLocation(this._shaderProgram,'uSampler');}
+_resizeCanvas(){this._canvasElement.width=this._canvasElement.offsetWidth*window.devicePixelRatio;this._canvasElement.height=this._canvasElement.offsetHeight*window.devicePixelRatio;}
+_updateTransformAndConstraints(){const paddingFraction=0.1;const viewport=this._layerTree.viewportSize();const baseWidth=viewport?viewport.width:this._dimensionsForAutoscale.width;const baseHeight=viewport?viewport.height:this._dimensionsForAutoscale.height;const canvasWidth=this._canvasElement.width;const canvasHeight=this._canvasElement.height;const paddingX=canvasWidth*paddingFraction;const paddingY=canvasHeight*paddingFraction;const scaleX=(canvasWidth-2*paddingX)/baseWidth;const scaleY=(canvasHeight-2*paddingY)/baseHeight;const viewScale=Math.min(scaleX,scaleY);const minScaleConstraint=Math.min(baseWidth/this._dimensionsForAutoscale.width,baseHeight/this._dimensionsForAutoscale.width)/2;this._transformController.setScaleConstraints(minScaleConstraint,10/viewScale);const scale=this._transformController.scale();const rotateX=this._transformController.rotateX();const rotateY=this._transformController.rotateY();this._scale=scale*viewScale;const textureScale=Number.constrain(this._scale,0.1,1);if(textureScale!==this._oldTextureScale){this._oldTextureScale=textureScale;this._textureManager.setScale(textureScale);this.dispatchEventToListeners(LayerViewer.Layers3DView.Events.ScaleChanged,textureScale);}
+const scaleAndRotationMatrix=new WebKitCSSMatrix().scale(scale,scale,scale).translate(canvasWidth/2,canvasHeight/2,0).rotate(rotateX,rotateY,0).scale(viewScale,viewScale,viewScale).translate(-baseWidth/2,-baseHeight/2,0);let bounds;for(let i=0;i<this._rects.length;++i)
+bounds=UI.Geometry.boundsForTransformedPoints(scaleAndRotationMatrix,this._rects[i].vertices,bounds);this._transformController.clampOffsets((paddingX-bounds.maxX)/window.devicePixelRatio,(canvasWidth-paddingX-bounds.minX)/window.devicePixelRatio,(paddingY-bounds.maxY)/window.devicePixelRatio,(canvasHeight-paddingY-bounds.minY)/window.devicePixelRatio);const offsetX=this._transformController.offsetX()*window.devicePixelRatio;const offsetY=this._transformController.offsetY()*window.devicePixelRatio;this._projectionMatrix=new WebKitCSSMatrix().translate(offsetX,offsetY,0).multiply(scaleAndRotationMatrix);const glProjectionMatrix=new WebKitCSSMatrix().scale(1,-1,-1).translate(-1,-1,0).scale(2/this._canvasElement.width,2/this._canvasElement.height,1/1000000).multiply(this._projectionMatrix);this._gl.uniformMatrix4fv(this._shaderProgram.pMatrixUniform,false,this._arrayFromMatrix(glProjectionMatrix));}
+_arrayFromMatrix(m){return new Float32Array([m.m11,m.m12,m.m13,m.m14,m.m21,m.m22,m.m23,m.m24,m.m31,m.m32,m.m33,m.m34,m.m41,m.m42,m.m43,m.m44]);}
+_initWhiteTexture(){this._whiteTexture=this._gl.createTexture();this._gl.bindTexture(this._gl.TEXTURE_2D,this._whiteTexture);const whitePixel=new Uint8Array([255,255,255,255]);this._gl.texImage2D(this._gl.TEXTURE_2D,0,this._gl.RGBA,1,1,0,this._gl.RGBA,this._gl.UNSIGNED_BYTE,whitePixel);}
+_initChromeTextures(){function loadChromeTexture(index,url){UI.loadImage(url).then(image=>{this._chromeTextures[index]=image&&LayerViewer.LayerTextureManager._createTextureForImage(this._gl,image)||undefined;});}
+loadChromeTexture.call(this,LayerViewer.Layers3DView.ChromeTexture.Left,'Images/chromeLeft.png');loadChromeTexture.call(this,LayerViewer.Layers3DView.ChromeTexture.Middle,'Images/chromeMiddle.png');loadChromeTexture.call(this,LayerViewer.Layers3DView.ChromeTexture.Right,'Images/chromeRight.png');}
+_initGLIfNecessary(){if(this._gl)
+return this._gl;this._gl=this._initGL(this._canvasElement);if(!this._gl)
+return null;this._initShaders();this._initWhiteTexture();this._initChromeTextures();this._textureManager.setContext(this._gl);return this._gl;}
+_calculateDepthsAndVisibility(){this._depthByLayerId={};let depth=0;const showInternalLayers=this._layerViewHost.showInternalLayersSetting().get();const root=showInternalLayers?this._layerTree.root():(this._layerTree.contentRoot()||this._layerTree.root());const queue=[root];this._depthByLayerId[root.id()]=0;this._visibleLayers=new Set();while(queue.length>0){const layer=queue.shift();if(showInternalLayers||layer.drawsContent())
+this._visibleLayers.add(layer);const children=layer.children();for(let i=0;i<children.length;++i){this._depthByLayerId[children[i].id()]=++depth;queue.push(children[i]);}}
+this._maxDepth=depth;}
+_depthForLayer(layer){return this._depthByLayerId[layer.id()]*LayerViewer.Layers3DView.LayerSpacing;}
+_calculateScrollRectDepth(layer,index){return this._depthForLayer(layer)+index*LayerViewer.Layers3DView.ScrollRectSpacing+1;}
+_updateDimensionsForAutoscale(layer){this._dimensionsForAutoscale.width=Math.max(layer.width(),this._dimensionsForAutoscale.width);this._dimensionsForAutoscale.height=Math.max(layer.height(),this._dimensionsForAutoscale.height);}
+_calculateLayerRect(layer){if(!this._visibleLayers.has(layer))
+return;const selection=new LayerViewer.LayerView.LayerSelection(layer);const rect=new LayerViewer.Layers3DView.Rectangle(selection);rect.setVertices(layer.quad(),this._depthForLayer(layer));this._appendRect(rect);this._updateDimensionsForAutoscale(layer);}
+_appendRect(rect){const selection=rect.relatedObject;const isSelected=LayerViewer.LayerView.Selection.isEqual(this._lastSelection[LayerViewer.Layers3DView.OutlineType.Selected],selection);const isHovered=LayerViewer.LayerView.Selection.isEqual(this._lastSelection[LayerViewer.Layers3DView.OutlineType.Hovered],selection);if(isSelected){rect.borderColor=LayerViewer.Layers3DView.SelectedBorderColor;}else if(isHovered){rect.borderColor=LayerViewer.Layers3DView.HoveredBorderColor;const fillColor=rect.fillColor||[255,255,255,1];const maskColor=LayerViewer.Layers3DView.HoveredImageMaskColor;rect.fillColor=[fillColor[0]*maskColor[0]/255,fillColor[1]*maskColor[1]/255,fillColor[2]*maskColor[2]/255,fillColor[3]*maskColor[3]];}else{rect.borderColor=LayerViewer.Layers3DView.BorderColor;}
+rect.lineWidth=isSelected?LayerViewer.Layers3DView.SelectedBorderWidth:LayerViewer.Layers3DView.BorderWidth;this._rects.push(rect);}
+_calculateLayerScrollRects(layer){const scrollRects=layer.scrollRects();for(let i=0;i<scrollRects.length;++i){const selection=new LayerViewer.LayerView.ScrollRectSelection(layer,i);const rect=new LayerViewer.Layers3DView.Rectangle(selection);rect.calculateVerticesFromRect(layer,scrollRects[i].rect,this._calculateScrollRectDepth(layer,i));rect.fillColor=LayerViewer.Layers3DView.ScrollRectBackgroundColor;this._appendRect(rect);}}
+_calculateLayerTileRects(layer){const tiles=this._textureManager.tilesForLayer(layer);for(let i=0;i<tiles.length;++i){const tile=tiles[i];if(!tile.texture)
+continue;const selection=new LayerViewer.LayerView.SnapshotSelection(layer,{rect:tile.rect,snapshot:tile.snapshot});const rect=new LayerViewer.Layers3DView.Rectangle(selection);rect.calculateVerticesFromRect(layer,tile.rect,this._depthForLayer(layer)+1);rect.texture=tile.texture;this._appendRect(rect);}}
+_calculateRects(){this._rects=[];this._dimensionsForAutoscale={width:0,height:0};this._layerTree.forEachLayer(this._calculateLayerRect.bind(this));if(this._showSlowScrollRectsSetting.get())
+this._layerTree.forEachLayer(this._calculateLayerScrollRects.bind(this));if(this._layerTexture&&this._visibleLayers.has(this._layerTexture.layer)){const layer=this._layerTexture.layer;const selection=new LayerViewer.LayerView.LayerSelection(layer);const rect=new LayerViewer.Layers3DView.Rectangle(selection);rect.setVertices(layer.quad(),this._depthForLayer(layer));rect.texture=this._layerTexture.texture;this._appendRect(rect);}else if(this._showPaints()){this._layerTree.forEachLayer(this._calculateLayerTileRects.bind(this));}}
+_makeColorsArray(color){let colors=[];const normalizedColor=[color[0]/255,color[1]/255,color[2]/255,color[3]];for(let i=0;i<4;i++)
+colors=colors.concat(normalizedColor);return colors;}
+_setVertexAttribute(attribute,array,length){const gl=this._gl;const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(array),gl.STATIC_DRAW);gl.vertexAttribPointer(attribute,length,gl.FLOAT,false,0,0);}
+_drawRectangle(vertices,mode,color,texture){const gl=this._gl;const white=[255,255,255,1];color=color||white;this._setVertexAttribute(this._shaderProgram.vertexPositionAttribute,vertices,3);this._setVertexAttribute(this._shaderProgram.textureCoordAttribute,[0,1,1,1,1,0,0,0],2);this._setVertexAttribute(this._shaderProgram.vertexColorAttribute,this._makeColorsArray(color),color.length);if(texture){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this._shaderProgram.samplerUniform,0);}else{gl.bindTexture(gl.TEXTURE_2D,this._whiteTexture);}
+const numberOfVertices=vertices.length/3;gl.drawArrays(mode,0,numberOfVertices);}
+_drawTexture(vertices,texture,color){this._drawRectangle(vertices,this._gl.TRIANGLE_FAN,color,texture);}
+_drawViewportAndChrome(){const viewport=this._layerTree.viewportSize();if(!viewport)
+return;const drawChrome=!Common.moduleSetting('frameViewerHideChromeWindow').get()&&this._chromeTextures.length>=3&&this._chromeTextures.indexOf(undefined)<0;const z=(this._maxDepth+1)*LayerViewer.Layers3DView.LayerSpacing;const borderWidth=Math.ceil(LayerViewer.Layers3DView.ViewportBorderWidth*this._scale);let vertices=[viewport.width,0,z,viewport.width,viewport.height,z,0,viewport.height,z,0,0,z];this._gl.lineWidth(borderWidth);this._drawRectangle(vertices,drawChrome?this._gl.LINE_STRIP:this._gl.LINE_LOOP,LayerViewer.Layers3DView.ViewportBorderColor);if(!drawChrome)
+return;const borderAdjustment=LayerViewer.Layers3DView.ViewportBorderWidth/2;const viewportWidth=this._layerTree.viewportSize().width+2*borderAdjustment;const chromeHeight=this._chromeTextures[0].image.naturalHeight;const middleFragmentWidth=viewportWidth-this._chromeTextures[0].image.naturalWidth-this._chromeTextures[2].image.naturalWidth;let x=-borderAdjustment;const y=-chromeHeight;for(let i=0;i<this._chromeTextures.length;++i){const width=i===LayerViewer.Layers3DView.ChromeTexture.Middle?middleFragmentWidth:this._chromeTextures[i].image.naturalWidth;if(width<0||x+width>viewportWidth)
+break;vertices=[x,y,z,x+width,y,z,x+width,y+chromeHeight,z,x,y+chromeHeight,z];this._drawTexture(vertices,(this._chromeTextures[i]));x+=width;}}
+_drawViewRect(rect){const vertices=rect.vertices;if(rect.texture)
+this._drawTexture(vertices,rect.texture,rect.fillColor||undefined);else if(rect.fillColor)
+this._drawRectangle(vertices,this._gl.TRIANGLE_FAN,rect.fillColor);this._gl.lineWidth(rect.lineWidth);if(rect.borderColor)
+this._drawRectangle(vertices,this._gl.LINE_LOOP,rect.borderColor);}
+_update(){if(!this.isShowing()){this._needsUpdate=true;return;}
+if(!this._layerTree||!this._layerTree.root()){this._failBanner.show(this.contentElement);return;}
+const gl=this._initGLIfNecessary();if(!gl){this._failBanner.element.removeChildren();this._failBanner.element.appendChild(this._webglDisabledBanner());this._failBanner.show(this.contentElement);return;}
+this._failBanner.detach();this._gl.viewportWidth=this._canvasElement.width;this._gl.viewportHeight=this._canvasElement.height;this._calculateDepthsAndVisibility();this._calculateRects();this._updateTransformAndConstraints();gl.viewport(0,0,gl.viewportWidth,gl.viewportHeight);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);this._rects.forEach(this._drawViewRect.bind(this));this._drawViewportAndChrome();}
+_webglDisabledBanner(){const fragment=this.contentElement.ownerDocument.createDocumentFragment();fragment.createChild('div').textContent=Common.UIString('Can\'t display layers,');fragment.createChild('div').textContent=Common.UIString('WebGL support is disabled in your browser.');fragment.appendChild(UI.formatLocalized('Check %s for possible reasons.',[UI.XLink.create('about:gpu')]));return fragment;}
+_selectionFromEventPoint(event){if(!this._layerTree)
+return null;let closestIntersectionPoint=Infinity;let closestObject=null;const projectionMatrix=new WebKitCSSMatrix().scale(1,-1,-1).translate(-1,-1,0).multiply(this._projectionMatrix);const x0=(event.clientX-this._canvasElement.totalOffsetLeft())*window.devicePixelRatio;const y0=-(event.clientY-this._canvasElement.totalOffsetTop())*window.devicePixelRatio;function checkIntersection(rect){if(!rect.relatedObject)
+return;const t=rect.intersectWithLine(projectionMatrix,x0,y0);if(t<closestIntersectionPoint){closestIntersectionPoint=t;closestObject=rect.relatedObject;}}
+this._rects.forEach(checkIntersection);return closestObject;}
+_createVisibilitySetting(caption,name,value,toolbar){const setting=Common.settings.createSetting(name,value);setting.setTitle(Common.UIString(caption));setting.addChangeListener(this._update,this);toolbar.appendToolbarItem(new UI.ToolbarSettingCheckbox(setting));return setting;}
+_initToolbar(){this._panelToolbar=this._transformController.toolbar();this.contentElement.appendChild(this._panelToolbar.element);this._showSlowScrollRectsSetting=this._createVisibilitySetting('Slow scroll rects','frameViewerShowSlowScrollRects',true,this._panelToolbar);this._showPaintsSetting=this._createVisibilitySetting('Paints','frameViewerShowPaints',true,this._panelToolbar);this._showPaintsSetting.addChangeListener(this._updatePaints,this);Common.moduleSetting('frameViewerHideChromeWindow').addChangeListener(this._update,this);}
+_onContextMenu(event){const contextMenu=new UI.ContextMenu(event);contextMenu.defaultSection().appendItem(Common.UIString('Reset View'),this._transformController.resetAndNotify.bind(this._transformController),false);const selection=this._selectionFromEventPoint(event);if(selection&&selection.type()===LayerViewer.LayerView.Selection.Type.Snapshot){contextMenu.defaultSection().appendItem(Common.UIString('Show Paint Profiler'),this.dispatchEventToListeners.bind(this,LayerViewer.Layers3DView.Events.PaintProfilerRequested,selection),false);}
+this._layerViewHost.showContextMenu(contextMenu,selection);}
+_onMouseMove(event){if(event.which)
+return;this._layerViewHost.hoverObject(this._selectionFromEventPoint(event));}
+_onMouseDown(event){this._mouseDownX=event.clientX;this._mouseDownY=event.clientY;}
+_onMouseUp(event){const maxDistanceInPixels=6;if(this._mouseDownX&&Math.abs(event.clientX-this._mouseDownX)<maxDistanceInPixels&&Math.abs(event.clientY-this._mouseDownY)<maxDistanceInPixels)
+this._layerViewHost.selectObject(this._selectionFromEventPoint(event));delete this._mouseDownX;delete this._mouseDownY;}
+_onDoubleClick(event){const selection=this._selectionFromEventPoint(event);if(selection&&(selection.type()===LayerViewer.LayerView.Selection.Type.Snapshot||selection.layer()))
+this.dispatchEventToListeners(LayerViewer.Layers3DView.Events.PaintProfilerRequested,selection);event.stopPropagation();}
+_updatePaints(){if(this._showPaints()){this._textureManager.setLayerTree(this._layerTree);this._textureManager.forceUpdate();}else{this._textureManager.reset();}
+this._update();}
+_showPaints(){return this._showPaintsSetting.get();}};LayerViewer.Layers3DView.LayerStyle;LayerViewer.Layers3DView.OutlineType={Hovered:'hovered',Selected:'selected'};LayerViewer.Layers3DView.Events={PaintProfilerRequested:Symbol('PaintProfilerRequested'),ScaleChanged:Symbol('ScaleChanged')};LayerViewer.Layers3DView.ChromeTexture={Left:0,Middle:1,Right:2};LayerViewer.Layers3DView.ScrollRectTitles={RepaintsOnScroll:Common.UIString('repaints on scroll'),TouchEventHandler:Common.UIString('touch event listener'),WheelEventHandler:Common.UIString('mousewheel event listener')};LayerViewer.Layers3DView.FragmentShader=''+'precision mediump float;\n'+'varying vec4 vColor;\n'+'varying vec2 vTextureCoord;\n'+'uniform sampler2D uSampler;\n'+'void main(void)\n'+'{\n'+'    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)) * vColor;\n'+'}';LayerViewer.Layers3DView.VertexShader=''+'attribute vec3 aVertexPosition;\n'+'attribute vec2 aTextureCoord;\n'+'attribute vec4 aVertexColor;\n'+'uniform mat4 uPMatrix;\n'+'varying vec2 vTextureCoord;\n'+'varying vec4 vColor;\n'+'void main(void)\n'+'{\n'+'gl_Position = uPMatrix * vec4(aVertexPosition, 1.0);\n'+'vColor = aVertexColor;\n'+'vTextureCoord = aTextureCoord;\n'+'}';LayerViewer.Layers3DView.HoveredBorderColor=[0,0,255,1];LayerViewer.Layers3DView.SelectedBorderColor=[0,255,0,1];LayerViewer.Layers3DView.BorderColor=[0,0,0,1];LayerViewer.Layers3DView.ViewportBorderColor=[160,160,160,1];LayerViewer.Layers3DView.ScrollRectBackgroundColor=[178,100,100,0.6];LayerViewer.Layers3DView.HoveredImageMaskColor=[200,200,255,1];LayerViewer.Layers3DView.BorderWidth=1;LayerViewer.Layers3DView.SelectedBorderWidth=2;LayerViewer.Layers3DView.ViewportBorderWidth=3;LayerViewer.Layers3DView.LayerSpacing=20;LayerViewer.Layers3DView.ScrollRectSpacing=4;LayerViewer.LayerTextureManager=class{constructor(textureUpdatedCallback){this._textureUpdatedCallback=textureUpdatedCallback;this._throttler=new Common.Throttler(0);this._scale=0;this._active=false;this.reset();}
+static _createTextureForImage(gl,image){const texture=gl.createTexture();texture.image=image;gl.bindTexture(gl.TEXTURE_2D,texture);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,texture.image);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.bindTexture(gl.TEXTURE_2D,null);return texture;}
+reset(){if(this._tilesByLayer)
+this.setLayerTree(null);this._tilesByLayer=new Map();this._queue=[];}
+setContext(glContext){this._gl=glContext;if(this._scale)
+this._updateTextures();}
+suspend(){this._active=false;}
+resume(){this._active=true;if(this._queue.length)
+this._update();}
+setLayerTree(layerTree){const newLayers=new Set();const oldLayers=Array.from(this._tilesByLayer.keys());if(layerTree){layerTree.forEachLayer(layer=>{if(!layer.drawsContent())
+return;newLayers.add(layer);if(!this._tilesByLayer.has(layer)){this._tilesByLayer.set(layer,[]);this.layerNeedsUpdate(layer);}});}
+if(!oldLayers.length)
+this.forceUpdate();for(const layer of oldLayers){if(newLayers.has(layer))
+continue;this._tilesByLayer.get(layer).forEach(tile=>tile.dispose());this._tilesByLayer.delete(layer);}}
+_setSnapshotsForLayer(layer,snapshots){const oldSnapshotsToTiles=new Map((this._tilesByLayer.get(layer)||[]).map(tile=>[tile.snapshot,tile]));const newTiles=[];const reusedTiles=[];for(const snapshot of snapshots){const oldTile=oldSnapshotsToTiles.get(snapshot);if(oldTile){reusedTiles.push(oldTile);oldSnapshotsToTiles.delete(oldTile);}else{newTiles.push(new LayerViewer.LayerTextureManager.Tile(snapshot));}}
+this._tilesByLayer.set(layer,reusedTiles.concat(newTiles));for(const tile of oldSnapshotsToTiles.values())
+tile.dispose();if(!this._gl||!this._scale)
+return Promise.resolve();return Promise.all(newTiles.map(tile=>tile.update(this._gl,this._scale))).then(this._textureUpdatedCallback);}
+setScale(scale){if(this._scale&&this._scale>=scale)
+return;this._scale=scale;this._updateTextures();}
+tilesForLayer(layer){return this._tilesByLayer.get(layer)||[];}
+layerNeedsUpdate(layer){if(this._queue.indexOf(layer)<0)
+this._queue.push(layer);if(this._active)
+this._throttler.schedule(this._update.bind(this));}
+forceUpdate(){this._queue.forEach(layer=>this._updateLayer(layer));this._queue=[];this._update();}
+_update(){const layer=this._queue.shift();if(!layer)
+return Promise.resolve();if(this._queue.length)
+this._throttler.schedule(this._update.bind(this));return this._updateLayer(layer);}
+_updateLayer(layer){return Promise.all(layer.snapshots()).then(snapshots=>this._setSnapshotsForLayer(layer,snapshots.filter(snapshot=>!!snapshot)));}
+_updateTextures(){if(!this._gl)
+return;if(!this._scale)
+return;for(const tiles of this._tilesByLayer.values()){for(const tile of tiles){const promise=tile.updateScale(this._gl,this._scale);if(promise)
+promise.then(this._textureUpdatedCallback);}}}};LayerViewer.Layers3DView.Rectangle=class{constructor(relatedObject){this.relatedObject=relatedObject;this.lineWidth=1;this.borderColor=null;this.fillColor=null;this.texture=null;}
+setVertices(quad,z){this.vertices=[quad[0],quad[1],z,quad[2],quad[3],z,quad[4],quad[5],z,quad[6],quad[7],z];}
+_calculatePointOnQuad(quad,ratioX,ratioY){const x0=quad[0];const y0=quad[1];const x1=quad[2];const y1=quad[3];const x2=quad[4];const y2=quad[5];const x3=quad[6];const y3=quad[7];const firstSidePointX=x0+ratioX*(x1-x0);const firstSidePointY=y0+ratioX*(y1-y0);const thirdSidePointX=x3+ratioX*(x2-x3);const thirdSidePointY=y3+ratioX*(y2-y3);const x=firstSidePointX+ratioY*(thirdSidePointX-firstSidePointX);const y=firstSidePointY+ratioY*(thirdSidePointY-firstSidePointY);return[x,y];}
+calculateVerticesFromRect(layer,rect,z){const quad=layer.quad();const rx1=rect.x/layer.width();const rx2=(rect.x+rect.width)/layer.width();const ry1=rect.y/layer.height();const ry2=(rect.y+rect.height)/layer.height();const rectQuad=this._calculatePointOnQuad(quad,rx1,ry1).concat(this._calculatePointOnQuad(quad,rx2,ry1)).concat(this._calculatePointOnQuad(quad,rx2,ry2)).concat(this._calculatePointOnQuad(quad,rx1,ry2));this.setVertices(rectQuad,z);}
+intersectWithLine(matrix,x0,y0){let i;const points=[];for(i=0;i<4;++i){points[i]=UI.Geometry.multiplyVectorByMatrixAndNormalize(new UI.Geometry.Vector(this.vertices[i*3],this.vertices[i*3+1],this.vertices[i*3+2]),matrix);}
+const normal=UI.Geometry.crossProduct(UI.Geometry.subtract(points[1],points[0]),UI.Geometry.subtract(points[2],points[1]));const A=normal.x;const B=normal.y;const C=normal.z;const D=-(A*points[0].x+B*points[0].y+C*points[0].z);const t=-(D+A*x0+B*y0)/C;const pt=new UI.Geometry.Vector(x0,y0,t);const tVects=points.map(UI.Geometry.subtract.bind(null,pt));for(i=0;i<tVects.length;++i){const product=UI.Geometry.scalarProduct(normal,UI.Geometry.crossProduct(tVects[i],tVects[(i+1)%tVects.length]));if(product<0)
+return undefined;}
+return t;}};LayerViewer.LayerTextureManager.Tile=class{constructor(snapshotWithRect){this.snapshot=snapshotWithRect.snapshot;this.rect=snapshotWithRect.rect;this.scale=0;this.texture=null;}
+dispose(){this.snapshot.release();if(this.texture){this._gl.deleteTexture(this.texture);this.texture=null;}}
+updateScale(glContext,scale){if(this.texture&&this.scale>=scale)
+return null;return this.update(glContext,scale);}
+async update(glContext,scale){this._gl=glContext;this.scale=scale;const imageURL=await this.snapshot.replay(scale);const image=imageURL&&await UI.loadImage(imageURL);this.texture=image&&LayerViewer.LayerTextureManager._createTextureForImage(glContext,image);}};;LayerViewer.PaintProfilerView=class extends UI.HBox{constructor(showImageCallback){super(true);this.registerRequiredCSS('layer_viewer/paintProfiler.css');this.contentElement.classList.add('paint-profiler-overview');this._canvasContainer=this.contentElement.createChild('div','paint-profiler-canvas-container');this._progressBanner=this.contentElement.createChild('div','full-widget-dimmed-banner hidden');this._progressBanner.textContent=Common.UIString('Profiling\u2026');this._pieChart=new PerfUI.PieChart(55,this._formatPieChartTime.bind(this),true);this._pieChart.element.classList.add('paint-profiler-pie-chart');this.contentElement.appendChild(this._pieChart.element);this._showImageCallback=showImageCallback;this._canvas=this._canvasContainer.createChild('canvas','fill');this._context=this._canvas.getContext('2d');this._selectionWindow=new PerfUI.OverviewGrid.Window(this._canvasContainer);this._selectionWindow.addEventListener(PerfUI.OverviewGrid.Events.WindowChanged,this._onWindowChanged,this);this._innerBarWidth=4*window.devicePixelRatio;this._minBarHeight=window.devicePixelRatio;this._barPaddingWidth=2*window.devicePixelRatio;this._outerBarWidth=this._innerBarWidth+this._barPaddingWidth;this._pendingScale=1;this._scale=this._pendingScale;this._reset();}
+static categories(){if(LayerViewer.PaintProfilerView._categories)
+return LayerViewer.PaintProfilerView._categories;LayerViewer.PaintProfilerView._categories={shapes:new LayerViewer.PaintProfilerCategory('shapes',Common.UIString('Shapes'),'rgb(255, 161, 129)'),bitmap:new LayerViewer.PaintProfilerCategory('bitmap',Common.UIString('Bitmap'),'rgb(136, 196, 255)'),text:new LayerViewer.PaintProfilerCategory('text',Common.UIString('Text'),'rgb(180, 255, 137)'),misc:new LayerViewer.PaintProfilerCategory('misc',Common.UIString('Misc'),'rgb(206, 160, 255)')};return LayerViewer.PaintProfilerView._categories;}
+static _initLogItemCategories(){if(LayerViewer.PaintProfilerView._logItemCategoriesMap)
+return LayerViewer.PaintProfilerView._logItemCategoriesMap;const categories=LayerViewer.PaintProfilerView.categories();const logItemCategories={};logItemCategories['Clear']=categories['misc'];logItemCategories['DrawPaint']=categories['misc'];logItemCategories['DrawData']=categories['misc'];logItemCategories['SetMatrix']=categories['misc'];logItemCategories['PushCull']=categories['misc'];logItemCategories['PopCull']=categories['misc'];logItemCategories['Translate']=categories['misc'];logItemCategories['Scale']=categories['misc'];logItemCategories['Concat']=categories['misc'];logItemCategories['Restore']=categories['misc'];logItemCategories['SaveLayer']=categories['misc'];logItemCategories['Save']=categories['misc'];logItemCategories['BeginCommentGroup']=categories['misc'];logItemCategories['AddComment']=categories['misc'];logItemCategories['EndCommentGroup']=categories['misc'];logItemCategories['ClipRect']=categories['misc'];logItemCategories['ClipRRect']=categories['misc'];logItemCategories['ClipPath']=categories['misc'];logItemCategories['ClipRegion']=categories['misc'];logItemCategories['DrawPoints']=categories['shapes'];logItemCategories['DrawRect']=categories['shapes'];logItemCategories['DrawOval']=categories['shapes'];logItemCategories['DrawRRect']=categories['shapes'];logItemCategories['DrawPath']=categories['shapes'];logItemCategories['DrawVertices']=categories['shapes'];logItemCategories['DrawDRRect']=categories['shapes'];logItemCategories['DrawBitmap']=categories['bitmap'];logItemCategories['DrawBitmapRectToRect']=categories['bitmap'];logItemCategories['DrawBitmapMatrix']=categories['bitmap'];logItemCategories['DrawBitmapNine']=categories['bitmap'];logItemCategories['DrawSprite']=categories['bitmap'];logItemCategories['DrawPicture']=categories['bitmap'];logItemCategories['DrawText']=categories['text'];logItemCategories['DrawPosText']=categories['text'];logItemCategories['DrawPosTextH']=categories['text'];logItemCategories['DrawTextOnPath']=categories['text'];LayerViewer.PaintProfilerView._logItemCategoriesMap=logItemCategories;return logItemCategories;}
+static _categoryForLogItem(logItem){const method=logItem.method.toTitleCase();const logItemCategories=LayerViewer.PaintProfilerView._initLogItemCategories();let result=logItemCategories[method];if(!result){result=LayerViewer.PaintProfilerView.categories()['misc'];logItemCategories[method]=result;}
+return result;}
+onResize(){this._update();}
+async setSnapshotAndLog(snapshot,log,clipRect){this._reset();this._snapshot=snapshot;if(this._snapshot)
+this._snapshot.addReference();this._log=log;this._logCategories=this._log.map(LayerViewer.PaintProfilerView._categoryForLogItem);if(!this._snapshot){this._update();this._pieChart.setTotal(0);this._selectionWindow.setEnabled(false);return;}
+this._selectionWindow.setEnabled(true);this._progressBanner.classList.remove('hidden');this._updateImage();const profiles=await snapshot.profile(clipRect);this._progressBanner.classList.add('hidden');this._profiles=profiles;this._update();this._updatePieChart();}
+setScale(scale){const needsUpdate=scale>this._scale;const predictiveGrowthFactor=2;this._pendingScale=Math.min(1,scale*predictiveGrowthFactor);if(needsUpdate&&this._snapshot)
+this._updateImage();}
+_update(){this._canvas.width=this._canvasContainer.clientWidth*window.devicePixelRatio;this._canvas.height=this._canvasContainer.clientHeight*window.devicePixelRatio;this._samplesPerBar=0;if(!this._profiles||!this._profiles.length)
+return;const maxBars=Math.floor((this._canvas.width-2*this._barPaddingWidth)/this._outerBarWidth);const sampleCount=this._log.length;this._samplesPerBar=Math.ceil(sampleCount/maxBars);let maxBarTime=0;const barTimes=[];const barHeightByCategory=[];let heightByCategory={};for(let i=0,lastBarIndex=0,lastBarTime=0;i<sampleCount;){let categoryName=(this._logCategories[i]&&this._logCategories[i].name)||'misc';const sampleIndex=this._log[i].commandIndex;for(let row=0;row<this._profiles.length;row++){const sample=this._profiles[row][sampleIndex];lastBarTime+=sample;heightByCategory[categoryName]=(heightByCategory[categoryName]||0)+sample;}
+++i;if(i-lastBarIndex===this._samplesPerBar||i===sampleCount){const factor=this._profiles.length*(i-lastBarIndex);lastBarTime/=factor;for(categoryName in heightByCategory)
+heightByCategory[categoryName]/=factor;barTimes.push(lastBarTime);barHeightByCategory.push(heightByCategory);if(lastBarTime>maxBarTime)
+maxBarTime=lastBarTime;lastBarTime=0;heightByCategory={};lastBarIndex=i;}}
+const paddingHeight=4*window.devicePixelRatio;const scale=(this._canvas.height-paddingHeight-this._minBarHeight)/maxBarTime;for(let i=0;i<barTimes.length;++i){for(const categoryName in barHeightByCategory[i])
+barHeightByCategory[i][categoryName]*=(barTimes[i]*scale+this._minBarHeight)/barTimes[i];this._renderBar(i,barHeightByCategory[i]);}}
+_renderBar(index,heightByCategory){const categories=LayerViewer.PaintProfilerView.categories();let currentHeight=0;const x=this._barPaddingWidth+index*this._outerBarWidth;for(const categoryName in categories){if(!heightByCategory[categoryName])
+continue;currentHeight+=heightByCategory[categoryName];const y=this._canvas.height-currentHeight;this._context.fillStyle=categories[categoryName].color;this._context.fillRect(x,y,this._innerBarWidth,heightByCategory[categoryName]);}}
+_onWindowChanged(){this.dispatchEventToListeners(LayerViewer.PaintProfilerView.Events.WindowChanged);this._updatePieChart();if(this._updateImageTimer)
+return;this._updateImageTimer=setTimeout(this._updateImage.bind(this),100);}
+_updatePieChart(){const window=this.selectionWindow();if(!this._profiles||!this._profiles.length||!window)
+return;let totalTime=0;const timeByCategory={};for(let i=window.left;i<window.right;++i){const logEntry=this._log[i];const category=LayerViewer.PaintProfilerView._categoryForLogItem(logEntry);timeByCategory[category.color]=timeByCategory[category.color]||0;for(let j=0;j<this._profiles.length;++j){const time=this._profiles[j][logEntry.commandIndex];totalTime+=time;timeByCategory[category.color]+=time;}}
+this._pieChart.setTotal(totalTime/this._profiles.length);for(const color in timeByCategory)
+this._pieChart.addSlice(timeByCategory[color]/this._profiles.length,color);}
+_formatPieChartTime(value){return Number.millisToString(value*1000,true);}
+selectionWindow(){if(!this._log)
+return null;const screenLeft=this._selectionWindow.windowLeft*this._canvas.width;const screenRight=this._selectionWindow.windowRight*this._canvas.width;const barLeft=Math.floor(screenLeft/this._outerBarWidth);const barRight=Math.floor((screenRight+this._innerBarWidth-this._barPaddingWidth/2)/this._outerBarWidth);const stepLeft=Number.constrain(barLeft*this._samplesPerBar,0,this._log.length-1);const stepRight=Number.constrain(barRight*this._samplesPerBar,0,this._log.length);return{left:stepLeft,right:stepRight};}
+_updateImage(){delete this._updateImageTimer;let left;let right;const window=this.selectionWindow();if(this._profiles&&this._profiles.length&&window){left=this._log[window.left].commandIndex;right=this._log[window.right-1].commandIndex;}
+const scale=this._pendingScale;this._snapshot.replay(scale,left,right).then(image=>{if(!image)
+return;this._scale=scale;this._showImageCallback(image);});}
+_reset(){if(this._snapshot)
+this._snapshot.release();this._snapshot=null;this._profiles=null;this._selectionWindow.reset();this._selectionWindow.setEnabled(false);}};LayerViewer.PaintProfilerView.Events={WindowChanged:Symbol('WindowChanged')};LayerViewer.PaintProfilerCommandLogView=class extends UI.ThrottledWidget{constructor(){super();this.setMinimumSize(100,25);this.element.classList.add('overflow-auto');this._treeOutline=new UI.TreeOutlineInShadow();this.element.appendChild(this._treeOutline.element);this._log=[];}
+setCommandLog(log){this._log=log;this._treeItemCache=new Map();this.updateWindow({left:0,right:this._log.length});}
+_appendLogItem(logItem){let treeElement=this._treeItemCache.get(logItem);if(!treeElement){treeElement=new LayerViewer.LogTreeElement(this,logItem);this._treeItemCache.set(logItem,treeElement);}else if(treeElement.parent){return;}
+this._treeOutline.appendChild(treeElement);}
+updateWindow(selectionWindow){this._selectionWindow=selectionWindow;this.update();}
+doUpdate(){if(!this._selectionWindow||!this._log.length){this._treeOutline.removeChildren();return Promise.resolve();}
+const root=this._treeOutline.rootElement();for(;;){const child=root.firstChild();if(!child||child._logItem.commandIndex>=this._selectionWindow.left)
+break;root.removeChildAtIndex(0);}
+for(;;){const child=root.lastChild();if(!child||child._logItem.commandIndex<this._selectionWindow.right)
+break;root.removeChildAtIndex(root.children().length-1);}
+for(let i=this._selectionWindow.left,right=this._selectionWindow.right;i<right;++i)
+this._appendLogItem(this._log[i]);return Promise.resolve();}};LayerViewer.LogTreeElement=class extends UI.TreeElement{constructor(ownerView,logItem){super('',!!logItem.params);this._logItem=logItem;this._ownerView=ownerView;this._filled=false;}
+onattach(){this._update();}
+onpopulate(){for(const param in this._logItem.params)
+LayerViewer.LogPropertyTreeElement._appendLogPropertyItem(this,param,this._logItem.params[param]);}
+_paramToString(param,name){if(typeof param!=='object')
+return typeof param==='string'&&param.length>100?name:JSON.stringify(param);let str='';let keyCount=0;for(const key in param){if(++keyCount>4||typeof param[key]==='object'||(typeof param[key]==='string'&&param[key].length>100))
+return name;if(str)
+str+=', ';str+=param[key];}
+return str;}
+_paramsToString(params){let str='';for(const key in params){if(str)
+str+=', ';str+=this._paramToString(params[key],key);}
+return str;}
+_update(){const title=createDocumentFragment();title.createTextChild(this._logItem.method+'('+this._paramsToString(this._logItem.params)+')');this.title=title;}};LayerViewer.LogPropertyTreeElement=class extends UI.TreeElement{constructor(property){super();this._property=property;}
+static _appendLogPropertyItem(element,name,value){const treeElement=new LayerViewer.LogPropertyTreeElement({name:name,value:value});element.appendChild(treeElement);if(value&&typeof value==='object'){for(const property in value)
+LayerViewer.LogPropertyTreeElement._appendLogPropertyItem(treeElement,property,value[property]);}}
+onattach(){const title=createDocumentFragment();const nameElement=title.createChild('span','name');nameElement.textContent=this._property.name;const separatorElement=title.createChild('span','separator');separatorElement.textContent=': ';if(this._property.value===null||typeof this._property.value!=='object'){const valueElement=title.createChild('span','value');valueElement.textContent=JSON.stringify(this._property.value);valueElement.classList.add('cm-js-'+(this._property.value===null?'null':typeof this._property.value));}
+this.title=title;}};LayerViewer.PaintProfilerCategory=class{constructor(name,title,color){this.name=name;this.title=title;this.color=color;}};;LayerViewer.TransformController=class extends Common.Object{constructor(element,disableRotate){super();this._shortcuts={};this.element=element;if(this.element.tabIndex<0)
+this.element.tabIndex=0;this._registerShortcuts();UI.installDragHandle(element,this._onDragStart.bind(this),this._onDrag.bind(this),this._onDragEnd.bind(this),'move',null);element.addEventListener('keydown',this._onKeyDown.bind(this),false);element.addEventListener('keyup',this._onKeyUp.bind(this),false);element.addEventListener('mousewheel',this._onMouseWheel.bind(this),false);this._minScale=0;this._maxScale=Infinity;this._controlPanelToolbar=new UI.Toolbar('transform-control-panel');this._modeButtons={};if(!disableRotate){const panModeButton=new UI.ToolbarToggle(Common.UIString('Pan mode (X)'),'largeicon-pan');panModeButton.addEventListener(UI.ToolbarButton.Events.Click,this._setMode.bind(this,LayerViewer.TransformController.Modes.Pan));this._modeButtons[LayerViewer.TransformController.Modes.Pan]=panModeButton;this._controlPanelToolbar.appendToolbarItem(panModeButton);const rotateModeButton=new UI.ToolbarToggle(Common.UIString('Rotate mode (V)'),'largeicon-rotate');rotateModeButton.addEventListener(UI.ToolbarButton.Events.Click,this._setMode.bind(this,LayerViewer.TransformController.Modes.Rotate));this._modeButtons[LayerViewer.TransformController.Modes.Rotate]=rotateModeButton;this._controlPanelToolbar.appendToolbarItem(rotateModeButton);}
+this._setMode(LayerViewer.TransformController.Modes.Pan);const resetButton=new UI.ToolbarButton(Common.UIString('Reset transform (0)'),'largeicon-center');resetButton.addEventListener(UI.ToolbarButton.Events.Click,this.resetAndNotify.bind(this,undefined));this._controlPanelToolbar.appendToolbarItem(resetButton);this._reset();}
+toolbar(){return this._controlPanelToolbar;}
+_onKeyDown(event){if(event.keyCode===UI.KeyboardShortcut.Keys.Shift.code){this._toggleMode();return;}
+const shortcutKey=UI.KeyboardShortcut.makeKeyFromEventIgnoringModifiers(event);const handler=this._shortcuts[shortcutKey];if(handler&&handler(event))
+event.consume();}
+_onKeyUp(event){if(event.keyCode===UI.KeyboardShortcut.Keys.Shift.code)
+this._toggleMode();}
+_addShortcuts(keys,handler){for(let i=0;i<keys.length;++i)
+this._shortcuts[keys[i].key]=handler;}
+_registerShortcuts(){this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.ResetView,this.resetAndNotify.bind(this));this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.PanMode,this._setMode.bind(this,LayerViewer.TransformController.Modes.Pan));this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.RotateMode,this._setMode.bind(this,LayerViewer.TransformController.Modes.Rotate));const zoomFactor=1.1;this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.ZoomIn,this._onKeyboardZoom.bind(this,zoomFactor));this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.ZoomOut,this._onKeyboardZoom.bind(this,1/zoomFactor));this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.Up,this._onKeyboardPanOrRotate.bind(this,0,-1));this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.Down,this._onKeyboardPanOrRotate.bind(this,0,1));this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.Left,this._onKeyboardPanOrRotate.bind(this,-1,0));this._addShortcuts(UI.ShortcutsScreen.LayersPanelShortcuts.Right,this._onKeyboardPanOrRotate.bind(this,1,0));}
+_postChangeEvent(){this.dispatchEventToListeners(LayerViewer.TransformController.Events.TransformChanged);}
+_reset(){this._scale=1;this._offsetX=0;this._offsetY=0;this._rotateX=0;this._rotateY=0;}
+_toggleMode(){this._setMode(this._mode===LayerViewer.TransformController.Modes.Pan?LayerViewer.TransformController.Modes.Rotate:LayerViewer.TransformController.Modes.Pan);}
+_setMode(mode){if(this._mode===mode)
+return;this._mode=mode;this._updateModeButtons();this.element.focus();}
+_updateModeButtons(){for(const mode in this._modeButtons)
+this._modeButtons[mode].setToggled(mode===this._mode);}
+resetAndNotify(event){this._reset();this._postChangeEvent();if(event)
+event.preventDefault();this.element.focus();}
+setScaleConstraints(minScale,maxScale){this._minScale=minScale;this._maxScale=maxScale;this._scale=Number.constrain(this._scale,minScale,maxScale);}
+clampOffsets(minX,maxX,minY,maxY){this._offsetX=Number.constrain(this._offsetX,minX,maxX);this._offsetY=Number.constrain(this._offsetY,minY,maxY);}
+scale(){return this._scale;}
+offsetX(){return this._offsetX;}
+offsetY(){return this._offsetY;}
+rotateX(){return this._rotateX;}
+rotateY(){return this._rotateY;}
+_onScale(scaleFactor,x,y){scaleFactor=Number.constrain(this._scale*scaleFactor,this._minScale,this._maxScale)/this._scale;this._scale*=scaleFactor;this._offsetX-=(x-this._offsetX)*(scaleFactor-1);this._offsetY-=(y-this._offsetY)*(scaleFactor-1);this._postChangeEvent();}
+_onPan(offsetX,offsetY){this._offsetX+=offsetX;this._offsetY+=offsetY;this._postChangeEvent();}
+_onRotate(rotateX,rotateY){this._rotateX=rotateX;this._rotateY=rotateY;this._postChangeEvent();}
+_onKeyboardZoom(zoomFactor){this._onScale(zoomFactor,this.element.clientWidth/2,this.element.clientHeight/2);}
+_onKeyboardPanOrRotate(xMultiplier,yMultiplier){const panStepInPixels=6;const rotateStepInDegrees=5;if(this._mode===LayerViewer.TransformController.Modes.Rotate){this._onRotate(this._rotateX+yMultiplier*rotateStepInDegrees,this._rotateY+xMultiplier*rotateStepInDegrees);}else{this._onPan(xMultiplier*panStepInPixels,yMultiplier*panStepInPixels);}}
+_onMouseWheel(event){const zoomFactor=1.1;const mouseWheelZoomSpeed=1/120;const scaleFactor=Math.pow(zoomFactor,event.wheelDeltaY*mouseWheelZoomSpeed);this._onScale(scaleFactor,event.clientX-this.element.totalOffsetLeft(),event.clientY-this.element.totalOffsetTop());}
+_onDrag(event){if(this._mode===LayerViewer.TransformController.Modes.Rotate){this._onRotate(this._oldRotateX+(this._originY-event.clientY)/this.element.clientHeight*180,this._oldRotateY-(this._originX-event.clientX)/this.element.clientWidth*180);}else{this._onPan(event.clientX-this._originX,event.clientY-this._originY);this._originX=event.clientX;this._originY=event.clientY;}}
+_onDragStart(event){this.element.focus();this._originX=event.clientX;this._originY=event.clientY;this._oldRotateX=this._rotateX;this._oldRotateY=this._rotateY;return true;}
+_onDragEnd(){delete this._originX;delete this._originY;delete this._oldRotateX;delete this._oldRotateY;}};LayerViewer.TransformController.Events={TransformChanged:Symbol('TransformChanged')};LayerViewer.TransformController.Modes={Pan:'Pan',Rotate:'Rotate',};;Runtime.cachedResources["layer_viewer/layers3DView.css"]="/*\n * Copyright 2016 The Chromium Authors. All rights reserved.\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n.layers-3d-view {\n    overflow: hidden;\n    -webkit-user-select: none;\n}\n\n.toolbar {\n    background-color: var(--toolbar-bg-color);\n    border-bottom: var(--divider-border);\n}\n\ncanvas {\n    flex: 1 1;\n}\n\n/*# sourceURL=layer_viewer/layers3DView.css */";Runtime.cachedResources["layer_viewer/paintProfiler.css"]="/*\n * Copyright 2016 The Chromium Authors. All rights reserved.\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\n.paint-profiler-overview {\n    background-color: #eee;\n}\n\n.paint-profiler-canvas-container {\n    flex: auto;\n    position: relative;\n}\n\n.paint-profiler-pie-chart {\n    width: 60px !important;\n    height: 60px !important;\n    padding: 2px;\n    overflow: hidden;\n    font-size: 10px;\n}\n\n.paint-profiler-canvas-container canvas {\n    z-index: 200;\n    background-color: white;\n    opacity: 0.95;\n    height: 100%;\n    width: 100%;\n}\n\n.paint-profiler-canvas-container .overview-grid-dividers-background,\n.paint-profiler-canvas-container .overview-grid-window {\n    bottom: 0;\n    height: auto;\n}\n\n.paint-profiler-canvas-container .overview-grid-window-resizer {\n    z-index: 2000;\n}\n\n/*# sourceURL=layer_viewer/paintProfiler.css */";Runtime.cachedResources["layer_viewer/layerDetailsView.css"]="/*\n * Copyright 2016 The Chromium Authors. All rights reserved.\n * Use of this source code is governed by a BSD-style license that can be\n * found in the LICENSE file.\n */\n\ntable td {\n    padding-left: 8px;\n}\n\ntable td:first-child {\n    font-weight: bold;\n}\n\n.scroll-rect.active {\n    background-color: rgba(100, 100, 100, 0.2);\n}\n\nul {\n    list-style: none;\n    padding-inline-start: 0;\n    margin-block-start: 0;\n    margin-block-end: 0;\n}\n\na {\n    padding: 8px;\n    display: block;\n}\n\n/*# sourceURL=layer_viewer/layerDetailsView.css */";Layers.LayerPaintProfilerView=class extends UI.SplitWidget{constructor(showImageCallback){super(true,false);this._logTreeView=new LayerViewer.PaintProfilerCommandLogView();this.setSidebarWidget(this._logTreeView);this._paintProfilerView=new LayerViewer.PaintProfilerView(showImageCallback);this.setMainWidget(this._paintProfilerView);this._paintProfilerView.addEventListener(LayerViewer.PaintProfilerView.Events.WindowChanged,this._onWindowChanged,this);}
+reset(){this._paintProfilerView.setSnapshotAndLog(null,[],null);}
+profile(snapshot){snapshot.commandLog().then(log=>setSnapshotAndLog.call(this,snapshot,log));function setSnapshotAndLog(snapshot,log){this._logTreeView.setCommandLog(log||[]);this._paintProfilerView.setSnapshotAndLog(snapshot,log||[],null);if(snapshot)
+snapshot.release();}}
+setScale(scale){this._paintProfilerView.setScale(scale);}
+_onWindowChanged(){this._logTreeView.updateWindow(this._paintProfilerView.selectionWindow());}};;Layers.LayerTreeModel=class extends SDK.SDKModel{constructor(target){super(target);this._layerTreeAgent=target.layerTreeAgent();target.registerLayerTreeDispatcher(new Layers.LayerTreeDispatcher(this));this._paintProfilerModel=(target.model(SDK.PaintProfilerModel));const resourceTreeModel=target.model(SDK.ResourceTreeModel);if(resourceTreeModel){resourceTreeModel.addEventListener(SDK.ResourceTreeModel.Events.MainFrameNavigated,this._onMainFrameNavigated,this);}
+this._layerTree=null;this._throttler=new Common.Throttler(20);}
+disable(){if(!this._enabled)
+return;this._enabled=false;this._layerTreeAgent.disable();}
+enable(){if(this._enabled)
+return;this._enabled=true;this._forceEnable();}
+_forceEnable(){this._lastPaintRectByLayerId={};if(!this._layerTree)
+this._layerTree=new Layers.AgentLayerTree(this);this._layerTreeAgent.enable();}
+layerTree(){return this._layerTree;}
+async _layerTreeChanged(layers){if(!this._enabled)
+return;this._throttler.schedule(this._innerSetLayers.bind(this,layers));}
+async _innerSetLayers(layers){const layerTree=(this._layerTree);await layerTree.setLayers(layers);for(const layerId in this._lastPaintRectByLayerId){const lastPaintRect=this._lastPaintRectByLayerId[layerId];const layer=layerTree.layerById(layerId);if(layer)
+layer._lastPaintRect=lastPaintRect;}
+this._lastPaintRectByLayerId={};this.dispatchEventToListeners(Layers.LayerTreeModel.Events.LayerTreeChanged);}
+_layerPainted(layerId,clipRect){if(!this._enabled)
+return;const layerTree=(this._layerTree);const layer=layerTree.layerById(layerId);if(!layer){this._lastPaintRectByLayerId[layerId]=clipRect;return;}
+layer._didPaint(clipRect);this.dispatchEventToListeners(Layers.LayerTreeModel.Events.LayerPainted,layer);}
+_onMainFrameNavigated(){this._layerTree=null;if(this._enabled)
+this._forceEnable();}};SDK.SDKModel.register(Layers.LayerTreeModel,SDK.Target.Capability.DOM,false);Layers.LayerTreeModel.Events={LayerTreeChanged:Symbol('LayerTreeChanged'),LayerPainted:Symbol('LayerPainted'),};Layers.AgentLayerTree=class extends SDK.LayerTreeBase{constructor(layerTreeModel){super(layerTreeModel.target());this._layerTreeModel=layerTreeModel;}
+async setLayers(payload){if(!payload){this._innerSetLayers(payload);return;}
+const idsToResolve=new Set();for(let i=0;i<payload.length;++i){const backendNodeId=payload[i].backendNodeId;if(!backendNodeId||this.backendNodeIdToNode().has(backendNodeId))
+continue;idsToResolve.add(backendNodeId);}
+await this.resolveBackendNodeIds(idsToResolve);this._innerSetLayers(payload);}
+_innerSetLayers(layers){this.setRoot(null);this.setContentRoot(null);if(!layers)
+return;let root;const oldLayersById=this._layersById;this._layersById={};for(let i=0;i<layers.length;++i){const layerId=layers[i].layerId;let layer=oldLayersById[layerId];if(layer)
+layer._reset(layers[i]);else
+layer=new Layers.AgentLayer(this._layerTreeModel,layers[i]);this._layersById[layerId]=layer;const backendNodeId=layers[i].backendNodeId;if(backendNodeId)
+layer._setNode(this.backendNodeIdToNode().get(backendNodeId));if(!this.contentRoot()&&layer.drawsContent())
+this.setContentRoot(layer);const parentId=layer.parentId();if(parentId){const parent=this._layersById[parentId];if(!parent)
+console.assert(parent,'missing parent '+parentId+' for layer '+layerId);parent.addChild(layer);}else{if(root)
+console.assert(false,'Multiple root layers');root=layer;}}
+if(root){this.setRoot(root);root._calculateQuad(new WebKitCSSMatrix());}}};Layers.AgentLayer=class{constructor(layerTreeModel,layerPayload){this._layerTreeModel=layerTreeModel;this._reset(layerPayload);}
+id(){return this._layerPayload.layerId;}
+parentId(){return this._layerPayload.parentLayerId;}
+parent(){return this._parent;}
+isRoot(){return!this.parentId();}
+children(){return this._children;}
+addChild(child){if(child._parent)
+console.assert(false,'Child already has a parent');this._children.push(child);child._parent=this;}
+_setNode(node){this._node=node;}
+node(){return this._node;}
+nodeForSelfOrAncestor(){for(let layer=this;layer;layer=layer._parent){if(layer._node)
+return layer._node;}
+return null;}
+offsetX(){return this._layerPayload.offsetX;}
+offsetY(){return this._layerPayload.offsetY;}
+width(){return this._layerPayload.width;}
+height(){return this._layerPayload.height;}
+transform(){return this._layerPayload.transform;}
+quad(){return this._quad;}
+anchorPoint(){return[this._layerPayload.anchorX||0,this._layerPayload.anchorY||0,this._layerPayload.anchorZ||0,];}
+invisible(){return this._layerPayload.invisible;}
+paintCount(){return this._paintCount||this._layerPayload.paintCount;}
+lastPaintRect(){return this._lastPaintRect;}
+scrollRects(){return this._scrollRects;}
+stickyPositionConstraint(){return this._stickyPositionConstraint;}
+async requestCompositingReasons(){const reasons=await this._layerTreeModel._layerTreeAgent.compositingReasons(this.id());return reasons||[];}
+drawsContent(){return this._layerPayload.drawsContent;}
+gpuMemoryUsage(){const bytesPerPixel=4;return this.drawsContent()?this.width()*this.height()*bytesPerPixel:0;}
+snapshots(){const promise=this._layerTreeModel._paintProfilerModel.makeSnapshot(this.id()).then(snapshot=>{if(!snapshot)
+return null;return{rect:{x:0,y:0,width:this.width(),height:this.height()},snapshot:snapshot};});return[promise];}
+_didPaint(rect){this._lastPaintRect=rect;this._paintCount=this.paintCount()+1;this._image=null;}
+_reset(layerPayload){this._node=null;this._children=[];this._parent=null;this._paintCount=0;this._layerPayload=layerPayload;this._image=null;this._scrollRects=this._layerPayload.scrollRects||[];this._stickyPositionConstraint=this._layerPayload.stickyPositionConstraint?new SDK.Layer.StickyPositionConstraint(this._layerTreeModel.layerTree(),this._layerPayload.stickyPositionConstraint):null;}
+_matrixFromArray(a){function toFixed9(x){return x.toFixed(9);}
+return new WebKitCSSMatrix('matrix3d('+a.map(toFixed9).join(',')+')');}
+_calculateTransformToViewport(parentTransform){const offsetMatrix=new WebKitCSSMatrix().translate(this._layerPayload.offsetX,this._layerPayload.offsetY);let matrix=offsetMatrix;if(this._layerPayload.transform){const transformMatrix=this._matrixFromArray(this._layerPayload.transform);const anchorVector=new UI.Geometry.Vector(this._layerPayload.width*this.anchorPoint()[0],this._layerPayload.height*this.anchorPoint()[1],this.anchorPoint()[2]);const anchorPoint=UI.Geometry.multiplyVectorByMatrixAndNormalize(anchorVector,matrix);const anchorMatrix=new WebKitCSSMatrix().translate(-anchorPoint.x,-anchorPoint.y,-anchorPoint.z);matrix=anchorMatrix.inverse().multiply(transformMatrix.multiply(anchorMatrix.multiply(matrix)));}
+matrix=parentTransform.multiply(matrix);return matrix;}
+_createVertexArrayForRect(width,height){return[0,0,0,width,0,0,width,height,0,0,height,0];}
+_calculateQuad(parentTransform){const matrix=this._calculateTransformToViewport(parentTransform);this._quad=[];const vertices=this._createVertexArrayForRect(this._layerPayload.width,this._layerPayload.height);for(let i=0;i<4;++i){const point=UI.Geometry.multiplyVectorByMatrixAndNormalize(new UI.Geometry.Vector(vertices[i*3],vertices[i*3+1],vertices[i*3+2]),matrix);this._quad.push(point.x,point.y);}
+function calculateQuadForLayer(layer){layer._calculateQuad(matrix);}
+this._children.forEach(calculateQuadForLayer);}};Layers.LayerTreeDispatcher=class{constructor(layerTreeModel){this._layerTreeModel=layerTreeModel;}
+layerTreeDidChange(layers){this._layerTreeModel._layerTreeChanged(layers||null);}
+layerPainted(layerId,clipRect){this._layerTreeModel._layerPainted(layerId,clipRect);}};;Layers.LayersPanel=class extends UI.PanelWithSidebar{constructor(){super('layers',225);this._model=null;SDK.targetManager.observeTargets(this);this._layerViewHost=new LayerViewer.LayerViewHost();this._layerTreeOutline=new LayerViewer.LayerTreeOutline(this._layerViewHost);this.panelSidebarElement().appendChild(this._layerTreeOutline.element);this.setDefaultFocusedElement(this._layerTreeOutline.element);this._rightSplitWidget=new UI.SplitWidget(false,true,'layerDetailsSplitViewState');this.splitWidget().setMainWidget(this._rightSplitWidget);this._layers3DView=new LayerViewer.Layers3DView(this._layerViewHost);this._rightSplitWidget.setMainWidget(this._layers3DView);this._layers3DView.addEventListener(LayerViewer.Layers3DView.Events.PaintProfilerRequested,this._onPaintProfileRequested,this);this._layers3DView.addEventListener(LayerViewer.Layers3DView.Events.ScaleChanged,this._onScaleChanged,this);this._tabbedPane=new UI.TabbedPane();this._rightSplitWidget.setSidebarWidget(this._tabbedPane);this._layerDetailsView=new LayerViewer.LayerDetailsView(this._layerViewHost);this._layerDetailsView.addEventListener(LayerViewer.LayerDetailsView.Events.PaintProfilerRequested,this._onPaintProfileRequested,this);this._tabbedPane.appendTab(Layers.LayersPanel.DetailsViewTabs.Details,Common.UIString('Details'),this._layerDetailsView);this._paintProfilerView=new Layers.LayerPaintProfilerView(this._showImage.bind(this));this._tabbedPane.addEventListener(UI.TabbedPane.Events.TabClosed,this._onTabClosed,this);this._updateThrottler=new Common.Throttler(100);}
+focus(){this._layerTreeOutline.focus();}
+wasShown(){super.wasShown();if(this._model)
+this._model.enable();}
+willHide(){if(this._model)
+this._model.disable();super.willHide();}
+targetAdded(target){if(this._model)
+return;this._model=target.model(Layers.LayerTreeModel);if(!this._model)
+return;this._model.addEventListener(Layers.LayerTreeModel.Events.LayerTreeChanged,this._onLayerTreeUpdated,this);this._model.addEventListener(Layers.LayerTreeModel.Events.LayerPainted,this._onLayerPainted,this);if(this.isShowing())
+this._model.enable();}
+targetRemoved(target){if(!this._model||this._model.target()!==target)
+return;this._model.removeEventListener(Layers.LayerTreeModel.Events.LayerTreeChanged,this._onLayerTreeUpdated,this);this._model.removeEventListener(Layers.LayerTreeModel.Events.LayerPainted,this._onLayerPainted,this);this._model.disable();this._model=null;}
+_onLayerTreeUpdated(){this._updateThrottler.schedule(this._update.bind(this));}
+_update(){if(this._model)
+this._layerViewHost.setLayerTree(this._model.layerTree());return Promise.resolve();}
+_onLayerPainted(event){if(!this._model)
+return;const layer=(event.data);if(this._layerViewHost.selection()&&this._layerViewHost.selection().layer()===layer)
+this._layerDetailsView.update();this._layers3DView.updateLayerSnapshot(layer);}
+_onPaintProfileRequested(event){const selection=(event.data);this._layers3DView.snapshotForSelection(selection).then(snapshotWithRect=>{if(!snapshotWithRect)
+return;this._layerBeingProfiled=selection.layer();if(!this._tabbedPane.hasTab(Layers.LayersPanel.DetailsViewTabs.Profiler)){this._tabbedPane.appendTab(Layers.LayersPanel.DetailsViewTabs.Profiler,Common.UIString('Profiler'),this._paintProfilerView,undefined,true,true);}
+this._tabbedPane.selectTab(Layers.LayersPanel.DetailsViewTabs.Profiler);this._paintProfilerView.profile(snapshotWithRect.snapshot);});}
+_onTabClosed(event){if(event.data.tabId!==Layers.LayersPanel.DetailsViewTabs.Profiler||!this._layerBeingProfiled)
+return;this._paintProfilerView.reset();this._layers3DView.showImageForLayer(this._layerBeingProfiled,undefined);this._layerBeingProfiled=null;}
+_showImage(imageURL){this._layers3DView.showImageForLayer(this._layerBeingProfiled,imageURL);}
+_onScaleChanged(event){this._paintProfilerView.setScale((event.data));}};Layers.LayersPanel.DetailsViewTabs={Details:'details',Profiler:'profiler'};;Network.BlockedURLsPane=class extends UI.VBox{constructor(){super(true);this.registerRequiredCSS('network/blockedURLsPane.css');Network.BlockedURLsPane._instance=this;this._manager=SDK.multitargetNetworkManager;this._manager.addEventListener(SDK.MultitargetNetworkManager.Events.BlockedPatternsChanged,this._update,this);this._toolbar=new UI.Toolbar('',this.contentElement);this._enabledCheckbox=new UI.ToolbarCheckbox(Common.UIString('Enable request blocking'),undefined,this._toggleEnabled.bind(this));this._toolbar.appendToolbarItem(this._enabledCheckbox);this._toolbar.appendSeparator();const addButton=new UI.ToolbarButton(Common.UIString('Add pattern'),'largeicon-add');addButton.addEventListener(UI.ToolbarButton.Events.Click,this._addButtonClicked,this);this._toolbar.appendToolbarItem(addButton);const clearButton=new UI.ToolbarButton(Common.UIString('Remove all patterns'),'largeicon-clear');clearButton.addEventListener(UI.ToolbarButton.Events.Click,this._removeAll,this);this._toolbar.appendToolbarItem(clearButton);this._list=new UI.ListWidget(this);this._list.element.classList.add('blocked-urls');this._list.registerRequiredCSS('network/blockedURLsPane.css');this._list.setEmptyPlaceholder(this._createEmptyPlaceholder());this._list.show(this.contentElement);this._editor=null;this._blockedCountForUrl=new Map();SDK.targetManager.addModelListener(SDK.NetworkManager,SDK.NetworkManager.Events.RequestFinished,this._onRequestFinished,this);this._updateThrottler=new Common.Throttler(200);this._update();}
+_createEmptyPlaceholder(){const element=this.contentElement.createChild('div','no-blocked-urls');element.createChild('span').textContent=Common.UIString('Requests are not blocked. ');const addLink=element.createChild('span','link');addLink.textContent=Common.UIString('Add pattern.');addLink.href='';addLink.addEventListener('click',this._addButtonClicked.bind(this),false);return element;}
+static reset(){if(Network.BlockedURLsPane._instance)
+Network.BlockedURLsPane._instance.reset();}
+_addButtonClicked(){this._manager.setBlockingEnabled(true);this._list.addNewItem(0,{url:'',enabled:true});}
+renderItem(pattern,editable){const count=this._blockedRequestsCount(pattern.url);const element=createElementWithClass('div','blocked-url');const checkbox=element.createChild('input','blocked-url-checkbox');checkbox.type='checkbox';checkbox.checked=pattern.enabled;checkbox.disabled=!this._manager.blockingEnabled();element.createChild('div','blocked-url-label').textContent=pattern.url;element.createChild('div','blocked-url-count').textContent=Common.UIString('%d blocked',count);element.addEventListener('click',event=>this._togglePattern(pattern,event),false);checkbox.addEventListener('click',event=>this._togglePattern(pattern,event),false);return element;}
+_togglePattern(pattern,event){event.consume(true);const patterns=this._manager.blockedPatterns();patterns.splice(patterns.indexOf(pattern),1,{enabled:!pattern.enabled,url:pattern.url});this._manager.setBlockedPatterns(patterns);}
+_toggleEnabled(){this._manager.setBlockingEnabled(!this._manager.blockingEnabled());this._update();}
+removeItemRequested(pattern,index){const patterns=this._manager.blockedPatterns();patterns.splice(index,1);this._manager.setBlockedPatterns(patterns);}
+beginEdit(pattern){this._editor=this._createEditor();this._editor.control('url').value=pattern.url;return this._editor;}
+commitEdit(item,editor,isNew){const url=editor.control('url').value;const patterns=this._manager.blockedPatterns();if(isNew)
+patterns.push({enabled:true,url:url});else
+patterns.splice(patterns.indexOf(item),1,{enabled:true,url:url});this._manager.setBlockedPatterns(patterns);}
+_createEditor(){if(this._editor)
+return this._editor;const editor=new UI.ListWidget.Editor();const content=editor.contentElement();const titles=content.createChild('div','blocked-url-edit-row');titles.createChild('div').textContent=Common.UIString('Text pattern to block matching requests; use * for wildcard');const fields=content.createChild('div','blocked-url-edit-row');const urlInput=editor.createInput('url','text','',(item,index,input)=>!!input.value&&!this._manager.blockedPatterns().find(pattern=>pattern.url===input.value));fields.createChild('div','blocked-url-edit-value').appendChild(urlInput);return editor;}
+_removeAll(){this._manager.setBlockedPatterns([]);}
+_update(){const enabled=this._manager.blockingEnabled();this._list.element.classList.toggle('blocking-disabled',!enabled&&!!this._manager.blockedPatterns().length);this._enabledCheckbox.setChecked(enabled);this._list.clear();for(const pattern of this._manager.blockedPatterns())
+this._list.appendItem(pattern,true);return Promise.resolve();}
+_blockedRequestsCount(url){if(!url)
+return 0;let result=0;for(const blockedUrl of this._blockedCountForUrl.keys()){if(this._matches(url,blockedUrl))
+result+=this._blockedCountForUrl.get(blockedUrl);}
+return result;}
+_matches(pattern,url){let pos=0;const parts=pattern.split('*');for(let index=0;index<parts.length;index++){const part=parts[index];if(!part.length)
+continue;pos=url.indexOf(part,pos);if(pos===-1)
+return false;pos+=part.length;}
+return true;}
+reset(){this._blockedCountForUrl.clear();this._updateThrottler.schedule(this._update.bind(this));}
+_onRequestFinished(event){const request=(event.data);if(request.wasBlocked()){const count=this._blockedCountForUrl.get(request.url())||0;this._blockedCountForUrl.set(request.url(),count+1);this._updateThrottler.schedule(this._update.bind(this));}}};Network.BlockedURLsPane._instance=null;;Network.EventSourceMessagesView=class extends UI.VBox{constructor(request){super();this.registerRequiredCSS('network/eventSourceMessagesView.css');this.element.classList.add('event-source-messages-view');this._request=request;const columns=([{id:'id',title:Common.UIString('Id'),sortable:true,weight:8},{id:'type',title:Common.UIString('Type'),sortable:true,weight:8},{id:'data',title:Common.UIString('Data'),sortable:false,weight:88},{id:'time',title:Common.UIString('Time'),sortable:true,weight:8}]);this._dataGrid=new DataGrid.SortableDataGrid(columns);this._dataGrid.setStriped(true);this._dataGrid.setStickToBottom(true);this._dataGrid.markColumnAsSortedBy('time',DataGrid.DataGrid.Order.Ascending);this._sortItems();this._dataGrid.addEventListener(DataGrid.DataGrid.Events.SortingChanged,this._sortItems,this);this._dataGrid.setName('EventSourceMessagesView');this._dataGrid.asWidget().show(this.element);}
+wasShown(){this._dataGrid.rootNode().removeChildren();const messages=this._request.eventSourceMessages();for(let i=0;i<messages.length;++i)
+this._dataGrid.insertChild(new Network.EventSourceMessageNode(messages[i]));this._request.addEventListener(SDK.NetworkRequest.Events.EventSourceMessageAdded,this._messageAdded,this);}
+willHide(){this._request.removeEventListener(SDK.NetworkRequest.Events.EventSourceMessageAdded,this._messageAdded,this);}
+_messageAdded(event){const message=(event.data);this._dataGrid.insertChild(new Network.EventSourceMessageNode(message));}
+_sortItems(){const sortColumnId=this._dataGrid.sortColumnId();if(!sortColumnId)
+return;const comparator=Network.EventSourceMessageNode.Comparators[sortColumnId];if(!comparator)
+return;this._dataGrid.sortNodes(comparator,!this._dataGrid.isSortOrderAscending());}};Network.EventSourceMessageNode=class extends DataGrid.SortableDataGridNode{constructor(message){const time=new Date(message.time*1000);const timeText=('0'+time.getHours()).substr(-2)+':'+('0'+time.getMinutes()).substr(-2)+':'+
+('0'+time.getSeconds()).substr(-2)+'.'+('00'+time.getMilliseconds()).substr(-3);const timeNode=createElement('div');timeNode.createTextChild(timeText);timeNode.title=time.toLocaleString();super({id:message.eventId,type:message.eventName,data:message.data,time:timeNode});this._message=message;}};Network.EventSourceMessageNodeComparator=function(field,a,b){const aValue=a._message[field];const bValue=b._message[field];return aValue<bValue?-1:aValue>bValue?1:0;};Network.EventSourceMessageNode.Comparators={'id':Network.EventSourceMessageNodeComparator.bind(null,'eventId'),'type':Network.EventSourceMessageNodeComparator.bind(null,'eventName'),'time':Network.EventSourceMessageNodeComparator.bind(null,'time')};;Network.HARWriter=class{static async write(stream,requests,progress){const compositeProgress=new Common.CompositeProgress(progress);const content=await Network.HARWriter._harStringForRequests(requests,compositeProgress);if(progress.isCanceled())
+return Promise.resolve();return Network.HARWriter._writeToStream(stream,compositeProgress,content);}
+static async _harStringForRequests(requests,compositeProgress){const progress=compositeProgress.createSubProgress();progress.setTitle(Common.UIString('Collecting content\u2026'));progress.setTotalWork(requests.length);const harLog=await SDK.HARLog.build(requests);const promises=[];for(let i=0;i<requests.length;i++){const promise=requests[i].contentData();promises.push(promise.then(contentLoaded.bind(null,harLog.entries[i])));}
+await Promise.all(promises);progress.done();if(progress.isCanceled())
+return'';return JSON.stringify({log:harLog},null,Network.HARWriter._jsonIndent);function isValidCharacter(code_point){return code_point<0xD800||(code_point>=0xE000&&code_point<0xFDD0)||(code_point>0xFDEF&&code_point<=0x10FFFF&&(code_point&0xFFFE)!==0xFFFE);}
+function needsEncoding(content){for(let i=0;i<content.length;i++){if(!isValidCharacter(content.charCodeAt(i)))
+return true;}
+return false;}
+function contentLoaded(entry,contentData){progress.worked();let encoded=contentData.encoded;if(contentData.content!==null){let content=contentData.content;if(content&&!encoded&&needsEncoding(content)){content=content.toBase64();encoded=true;}
+entry.response.content.text=content;}
+if(encoded)
+entry.response.content.encoding='base64';}}
+static async _writeToStream(stream,compositeProgress,fileContent){const progress=compositeProgress.createSubProgress();progress.setTitle(Common.UIString('Writing file\u2026'));progress.setTotalWork(fileContent.length);for(let i=0;i<fileContent.length&&!progress.isCanceled();i+=Network.HARWriter._chunkSize){const chunk=fileContent.substr(i,Network.HARWriter._chunkSize);await stream.write(chunk);progress.worked(chunk.length);}
+progress.done();}};Network.HARWriter._jsonIndent=2;Network.HARWriter._chunkSize=100000;;Network.NetworkConfigView=class extends UI.VBox{constructor(){super(true);this.registerRequiredCSS('network/networkConfigView.css');this.contentElement.classList.add('network-config');this._createCacheSection();this.contentElement.createChild('div').classList.add('panel-section-separator');this._createNetworkThrottlingSection();this.contentElement.createChild('div').classList.add('panel-section-separator');this._createUserAgentSection();}
+static createUserAgentSelectAndInput(){const userAgentSetting=Common.settings.createSetting('customUserAgent','');const userAgentSelectElement=createElement('select');const customOverride={title:Common.UIString('Custom...'),value:'custom'};userAgentSelectElement.appendChild(new Option(customOverride.title,customOverride.value));const groups=Network.NetworkConfigView._userAgentGroups;for(const userAgentDescriptor of groups){const groupElement=userAgentSelectElement.createChild('optgroup');groupElement.label=userAgentDescriptor.title;for(const userAgentVersion of userAgentDescriptor.values){const userAgentValue=SDK.MultitargetNetworkManager.patchUserAgentWithChromeVersion(userAgentVersion.value);groupElement.appendChild(new Option(userAgentVersion.title,userAgentValue));}}
+userAgentSelectElement.selectedIndex=0;const otherUserAgentElement=UI.createInput('','text');otherUserAgentElement.value=userAgentSetting.get();otherUserAgentElement.title=userAgentSetting.get();otherUserAgentElement.placeholder=Common.UIString('Enter a custom user agent');otherUserAgentElement.required=true;settingChanged();userAgentSelectElement.addEventListener('change',userAgentSelected,false);otherUserAgentElement.addEventListener('input',applyOtherUserAgent,false);function userAgentSelected(){const value=userAgentSelectElement.options[userAgentSelectElement.selectedIndex].value;if(value!==customOverride.value){userAgentSetting.set(value);otherUserAgentElement.value=value;otherUserAgentElement.title=value;}else{otherUserAgentElement.select();}}
+function settingChanged(){const value=userAgentSetting.get();const options=userAgentSelectElement.options;let selectionRestored=false;for(let i=0;i<options.length;++i){if(options[i].value===value){userAgentSelectElement.selectedIndex=i;selectionRestored=true;break;}}
+if(!selectionRestored)
+userAgentSelectElement.selectedIndex=0;}
+function applyOtherUserAgent(){if(userAgentSetting.get()!==otherUserAgentElement.value){userAgentSetting.set(otherUserAgentElement.value);otherUserAgentElement.title=otherUserAgentElement.value;settingChanged();}}
+return{select:userAgentSelectElement,input:otherUserAgentElement};}
+_createSection(title,className){const section=this.contentElement.createChild('section','network-config-group');if(className)
+section.classList.add(className);section.createChild('div','network-config-title').textContent=title;return section.createChild('div','network-config-fields');}
+_createCacheSection(){const section=this._createSection(Common.UIString('Caching'),'network-config-disable-cache');section.appendChild(UI.SettingsUI.createSettingCheckbox(Common.UIString('Disable cache'),Common.moduleSetting('cacheDisabled'),true));}
+_createNetworkThrottlingSection(){const section=this._createSection(Common.UIString('Network throttling'),'network-config-throttling');const networkThrottlingSelect=(section.createChild('select','chrome-select'));MobileThrottling.throttlingManager().decorateSelectWithNetworkThrottling(networkThrottlingSelect);}
+_createUserAgentSection(){const section=this._createSection(Common.UIString('User agent'),'network-config-ua');const checkboxLabel=UI.CheckboxLabel.create(Common.UIString('Select automatically'),true);section.appendChild(checkboxLabel);const autoCheckbox=checkboxLabel.checkboxElement;const customUserAgentSetting=Common.settings.createSetting('customUserAgent','');customUserAgentSetting.addChangeListener(()=>{if(autoCheckbox.checked)
+return;SDK.multitargetNetworkManager.setCustomUserAgentOverride(customUserAgentSetting.get());});const customUserAgentSelectBox=section.createChild('div','network-config-ua-custom');autoCheckbox.addEventListener('change',userAgentSelectBoxChanged);const customSelectAndInput=Network.NetworkConfigView.createUserAgentSelectAndInput();customSelectAndInput.select.classList.add('chrome-select');customUserAgentSelectBox.appendChild(customSelectAndInput.select);customUserAgentSelectBox.appendChild(customSelectAndInput.input);userAgentSelectBoxChanged();function userAgentSelectBoxChanged(){const useCustomUA=!autoCheckbox.checked;customUserAgentSelectBox.classList.toggle('checked',useCustomUA);customSelectAndInput.select.disabled=!useCustomUA;customSelectAndInput.input.disabled=!useCustomUA;const customUA=useCustomUA?customUserAgentSetting.get():'';SDK.multitargetNetworkManager.setCustomUserAgentOverride(customUA);}}};Network.NetworkConfigView._userAgentGroups=[{title:'Android',values:[{title:'Android (4.0.2) Browser \u2014 Galaxy Nexus',value:'Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30'},{title:'Android (2.3) Browser \u2014 Nexus S',value:'Mozilla/5.0 (Linux; U; Android 2.3.6; en-us; Nexus S Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1'}]},{title:'BlackBerry',values:[{title:'BlackBerry \u2014 BB10',value:'Mozilla/5.0 (BB10; Touch) AppleWebKit/537.1+ (KHTML, like Gecko) Version/10.0.0.1337 Mobile Safari/537.1+'},{title:'BlackBerry \u2014 PlayBook 2.1',value:'Mozilla/5.0 (PlayBook; U; RIM Tablet OS 2.1.0; en-US) AppleWebKit/536.2+ (KHTML, like Gecko) Version/7.2.1.0 Safari/536.2+'},{title:'BlackBerry \u2014 9900',value:'Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en-US) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.0.0.187 Mobile Safari/534.11+'}]},{title:'Chrome',values:[{title:'Chrome \u2014 Android Mobile',value:'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Mobile Safari/537.36'},{title:'Chrome \u2014 Android Tablet',value:'Mozilla/5.0 (Linux; Android 4.3; Nexus 7 Build/JSS15Q) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36'},{title:'Chrome \u2014 iPhone',value:'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/%s Mobile/13B143 Safari/601.1.46'},{title:'Chrome \u2014 iPad',value:'Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/%s Mobile/13B143 Safari/601.1.46'},{title:'Chrome \u2014 Chrome OS',value:'Mozilla/5.0 (X11; CrOS x86_64 10066.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36'},{title:'Chrome \u2014 Mac',value:'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36'},{title:'Chrome \u2014 Windows',value:'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Safari/537.36'}]},{title:'Edge',values:[{title:'Edge \u2014 Windows',value:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240'},{title:'Edge \u2014 Mobile',value:'Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166'},{title:'Edge \u2014 XBox',value:'Mozilla/5.0 (Windows NT 10.0; Win64; x64; Xbox; Xbox One) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/13.10586'}]},{title:'Firefox',values:[{title:'Firefox \u2014 Android Mobile',value:'Mozilla/5.0 (Android 4.4; Mobile; rv:46.0) Gecko/46.0 Firefox/46.0'},{title:'Firefox \u2014 Android Tablet',value:'Mozilla/5.0 (Android 4.4; Tablet; rv:46.0) Gecko/46.0 Firefox/46.0'},{title:'Firefox \u2014 iPhone',value:'Mozilla/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4'},{title:'Firefox \u2014 iPad',value:'Mozilla/5.0 (iPad; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4'},{title:'Firefox \u2014 Mac',value:'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:46.0) Gecko/20100101 Firefox/46.0'},{title:'Firefox \u2014 Windows',value:'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:46.0) Gecko/20100101 Firefox/46.0'}]},{title:'Googlebot',values:[{title:'Googlebot',value:'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'},{title:'Googlebot Smartphone',value:'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'}]},{title:'Internet Explorer',values:[{title:'Internet Explorer 11',value:'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'},{title:'Internet Explorer 10',value:'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)'},{title:'Internet Explorer 9',value:'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)'},{title:'Internet Explorer 8',value:'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)'},{title:'Internet Explorer 7',value:'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'}]},{title:'Opera',values:[{title:'Opera \u2014 Mac',value:'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.87 Safari/537.36 OPR/37.0.2178.31'},{title:'Opera \u2014 Windows',value:'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.87 Safari/537.36 OPR/37.0.2178.31'},{title:'Opera (Presto) \u2014 Mac',value:'Opera/9.80 (Macintosh; Intel Mac OS X 10.9.1) Presto/2.12.388 Version/12.16'},{title:'Opera (Presto) \u2014 Windows',value:'Opera/9.80 (Windows NT 6.1) Presto/2.12.388 Version/12.16'},{title:'Opera Mobile \u2014 Android Mobile',value:'Opera/12.02 (Android 4.1; Linux; Opera Mobi/ADR-1111101157; U; en-US) Presto/2.9.201 Version/12.02'},{title:'Opera Mini \u2014 iOS',value:'Opera/9.80 (iPhone; Opera Mini/8.0.0/34.2336; U; en) Presto/2.8.119 Version/11.10'}]},{title:'Safari',values:[{title:'Safari \u2014 iPad iOS 9',value:'Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B137 Safari/601.1'},{title:'Safari \u2014 iPhone iOS 9',value:'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B137 Safari/601.1'},{title:'Safari \u2014 Mac',value:'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A'}]},{title:'UC Browser',values:[{title:'UC Browser \u2014 Android Mobile',value:'Mozilla/5.0 (Linux; U; Android 4.4.4; en-US; XT1022 Build/KXC21.5-40) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 UCBrowser/10.7.0.636 U3/0.8.0 Mobile Safari/534.30'},{title:'UC Browser \u2014 iOS',value:'UCWEB/2.0 (iPad; U; CPU OS 7_1 like Mac OS X; en; iPad3,6) U2/1.0.0 UCBrowser/9.3.1.344'},{title:'UC Browser \u2014 Windows Phone',value:'NokiaX2-02/2.0 (11.79) Profile/MIDP-2.1 Configuration/CLDC-1.1 Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; SLCC2;.NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.2) UCBrowser8.4.0.159/70/352'}]}];;Network.NetworkNode=class extends DataGrid.SortableDataGridNode{constructor(parentView){super({});this._parentView=parentView;this._isHovered=false;this._isProduct=false;this._showingInitiatorChain=false;this._requestOrFirstKnownChildRequest=null;}
+static _themedBackgroundColors(){if(Network.NetworkNode._themedBackgroundColorsCache)
+return Network.NetworkNode._themedBackgroundColorsCache;const themedColors={};for(const name in Network.NetworkNode._backgroundColors){const color=Common.Color.fromRGBA(Network.NetworkNode._backgroundColors[name]);themedColors[name]=UI.themeSupport.patchColor(color,UI.ThemeSupport.ColorUsage.Background);}
+Network.NetworkNode._themedBackgroundColorsCache=(themedColors);return Network.NetworkNode._themedBackgroundColorsCache;}
+displayName(){return'';}
+createCell(columnId){const cell=this.createTD(columnId);this.renderCell(cell,columnId);return cell;}
+renderCell(cell,columnId){}
+backgroundColor(){const bgColors=Network.NetworkNode._themedBackgroundColors();if(this.selected)
+return(bgColors.Selected.asString(Common.Color.Format.HEX));let color=this.isStriped()?bgColors.Stripe:bgColors.Default;if(this.isNavigationRequest())
+color=color.blendWith(bgColors.Navigation);if(this.hovered())
+color=color.blendWith(bgColors.Hovered);if(this.isOnInitiatorPath())
+color=color.blendWith(bgColors.InitiatorPath);if(this.isOnInitiatedPath())
+color=color.blendWith(bgColors.InitiatedPath);return(color.asString(Common.Color.Format.HEX));}
+_updateBackgroundColor(){const element=this.existingElement();if(!element)
+return;element.style.backgroundColor=this.backgroundColor();this._parentView.stylesChanged();}
+setStriped(isStriped){super.setStriped(isStriped);this._updateBackgroundColor();}
+parentView(){return this._parentView;}
+hovered(){return this._isHovered;}
+showingInitiatorChain(){return this._showingInitiatorChain;}
+nodeSelfHeight(){return this._parentView.rowHeight();}
+setHovered(hovered,showInitiatorChain){if(this._isHovered===hovered&&this._showingInitiatorChain===showInitiatorChain)
+return;if(this._isHovered!==hovered){this._isHovered=hovered;if(this.attached())
+this.element().classList.toggle('hover',hovered);}
+if(this._showingInitiatorChain!==showInitiatorChain){this._showingInitiatorChain=showInitiatorChain;this.showingInitiatorChainChanged();}
+this._parentView.stylesChanged();this._updateBackgroundColor();}
+showingInitiatorChainChanged(){}
+isOnInitiatorPath(){return false;}
+isOnInitiatedPath(){return false;}
+request(){return null;}
+isNavigationRequest(){return false;}
+clearFlatNodes(){super.clearFlatNodes();this._requestOrFirstKnownChildRequest=null;}
+requestOrFirstKnownChildRequest(){if(this._requestOrFirstKnownChildRequest)
+return this._requestOrFirstKnownChildRequest;let request=this.request();if(request||!this.hasChildren()){this._requestOrFirstKnownChildRequest=request;return this._requestOrFirstKnownChildRequest;}
+let firstChildRequest=null;const flatChildren=this.flatChildren();for(let i=0;i<flatChildren.length;i++){request=flatChildren[i].request();if(!firstChildRequest||(request&&request.issueTime()<firstChildRequest.issueTime()))
+firstChildRequest=request;}
+this._requestOrFirstKnownChildRequest=firstChildRequest;return this._requestOrFirstKnownChildRequest;}};Network.NetworkNode._backgroundColors={Default:[255,255,255,1.0],Stripe:[245,245,245,1.0],Navigation:[221,238,255,1.0],Hovered:[235,242,252,0.7],InitiatorPath:[58,217,58,0.4],InitiatedPath:[217,58,58,0.4],Selected:[63,81,181,.6],FromFrame:[224,247,250,.4],IsProduct:[255,252,225,.6],};Network.NetworkNode._SupportedBackgroundColors;Network.NetworkNode._themedBackgroundColorsCache;Network.NetworkNode._ProductEntryInfo;Network.NetworkRequestNode=class extends Network.NetworkNode{constructor(parentView,request){super(parentView);this._nameCell=null;this._nameBadgeElement=null;this._initiatorCell=null;this._request=request;this._isNavigationRequest=false;this.selectable=true;this._isOnInitiatorPath=false;this._isOnInitiatedPath=false;}
+static NameComparator(a,b){const aName=a.displayName().toLowerCase();const bName=b.displayName().toLowerCase();if(aName===bName){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(aRequest&&bRequest)
+return aRequest.indentityCompare(bRequest);return aRequest?-1:1;}
+return aName<bName?-1:1;}
+static RemoteAddressComparator(a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aRemoteAddress=aRequest.remoteAddress();const bRemoteAddress=bRequest.remoteAddress();if(aRemoteAddress>bRemoteAddress)
+return 1;if(bRemoteAddress>aRemoteAddress)
+return-1;return aRequest.indentityCompare(bRequest);}
+static ProductComparator(productRegistry,a,b){const aRequest=a.request();const bRequest=b.request();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aName=productRegistry.nameForUrl(aRequest.parsedURL)||'';const bName=productRegistry.nameForUrl(bRequest.parsedURL)||'';return aName.localeCompare(bName)||aRequest.indentityCompare(bRequest);}
+static SizeComparator(a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;if(bRequest.cached()&&!aRequest.cached())
+return 1;if(aRequest.cached()&&!bRequest.cached())
+return-1;return(aRequest.transferSize-bRequest.transferSize)||(aRequest.resourceSize-bRequest.resourceSize)||aRequest.indentityCompare(bRequest);}
+static TypeComparator(a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aSimpleType=a.displayType();const bSimpleType=b.displayType();if(aSimpleType>bSimpleType)
+return 1;if(bSimpleType>aSimpleType)
+return-1;return aRequest.indentityCompare(bRequest);}
+static InitiatorComparator(a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;if(!a._initiatorCell||!b._initiatorCell)
+return!a._initiatorCell?-1:1;const aText=a._linkifiedInitiatorAnchor?a._linkifiedInitiatorAnchor.textContent:a._initiatorCell.title;const bText=b._linkifiedInitiatorAnchor?b._linkifiedInitiatorAnchor.textContent:b._initiatorCell.title;return aText.localeCompare(bText);}
+static RequestCookiesCountComparator(a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aScore=aRequest.requestCookies?aRequest.requestCookies.length:0;const bScore=bRequest.requestCookies?bRequest.requestCookies.length:0;return(aScore-bScore)||aRequest.indentityCompare(bRequest);}
+static ResponseCookiesCountComparator(a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aScore=aRequest.responseCookies?aRequest.responseCookies.length:0;const bScore=bRequest.responseCookies?bRequest.responseCookies.length:0;return(aScore-bScore)||aRequest.indentityCompare(bRequest);}
+static PriorityComparator(a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aPriority=aRequest.priority();let aScore=aPriority?PerfUI.networkPriorityWeight(aPriority):0;aScore=aScore||0;const bPriority=bRequest.priority();let bScore=bPriority?PerfUI.networkPriorityWeight(bPriority):0;bScore=bScore||0;return aScore-bScore||aRequest.indentityCompare(bRequest);}
+static RequestPropertyComparator(propertyName,a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aValue=aRequest[propertyName];const bValue=bRequest[propertyName];if(aValue===bValue)
+return aRequest.indentityCompare(bRequest);return aValue>bValue?1:-1;}
+static ResponseHeaderStringComparator(propertyName,a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aValue=String(aRequest.responseHeaderValue(propertyName)||'');const bValue=String(bRequest.responseHeaderValue(propertyName)||'');return aValue.localeCompare(bValue)||aRequest.indentityCompare(bRequest);}
+static ResponseHeaderNumberComparator(propertyName,a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aValue=(aRequest.responseHeaderValue(propertyName)!==undefined)?parseFloat(aRequest.responseHeaderValue(propertyName)):-Infinity;const bValue=(bRequest.responseHeaderValue(propertyName)!==undefined)?parseFloat(bRequest.responseHeaderValue(propertyName)):-Infinity;if(aValue===bValue)
+return aRequest.indentityCompare(bRequest);return aValue>bValue?1:-1;}
+static ResponseHeaderDateComparator(propertyName,a,b){const aRequest=a.requestOrFirstKnownChildRequest();const bRequest=b.requestOrFirstKnownChildRequest();if(!aRequest||!bRequest)
+return!aRequest?-1:1;const aHeader=aRequest.responseHeaderValue(propertyName);const bHeader=bRequest.responseHeaderValue(propertyName);const aValue=aHeader?new Date(aHeader).getTime():-Infinity;const bValue=bHeader?new Date(bHeader).getTime():-Infinity;if(aValue===bValue)
+return aRequest.indentityCompare(bRequest);return aValue>bValue?1:-1;}
+showingInitiatorChainChanged(){const showInitiatorChain=this.showingInitiatorChain();const initiatorGraph=SDK.networkLog.initiatorGraphForRequest(this._request);for(const request of initiatorGraph.initiators){if(request===this._request)
+continue;const node=this.parentView().nodeForRequest(request);if(!node)
+continue;node._setIsOnInitiatorPath(showInitiatorChain);}
+for(const request of initiatorGraph.initiated){if(request===this._request)
+continue;const node=this.parentView().nodeForRequest(request);if(!node)
+continue;node._setIsOnInitiatedPath(showInitiatorChain);}}
+_setIsOnInitiatorPath(isOnInitiatorPath){if(this._isOnInitiatorPath===isOnInitiatorPath||!this.attached())
+return;this._isOnInitiatorPath=isOnInitiatorPath;this._updateBackgroundColor();}
+isOnInitiatorPath(){return this._isOnInitiatorPath;}
+_setIsOnInitiatedPath(isOnInitiatedPath){if(this._isOnInitiatedPath===isOnInitiatedPath||!this.attached())
+return;this._isOnInitiatedPath=isOnInitiatedPath;this._updateBackgroundColor();}
+isOnInitiatedPath(){return this._isOnInitiatedPath;}
+displayType(){const mimeType=this._request.mimeType||this._request.requestContentType()||'';const resourceType=this._request.resourceType();let simpleType=resourceType.name();if(resourceType===Common.resourceTypes.Other||resourceType===Common.resourceTypes.Image)
+simpleType=mimeType.replace(/^(application|image)\//,'');return simpleType;}
+displayName(){return this._request.name();}
+request(){return this._request;}
+isNavigationRequest(){const pageLoad=SDK.NetworkLog.PageLoad.forRequest(this._request);return pageLoad?pageLoad.mainRequest===this._request:false;}
+nodeSelfHeight(){return this.parentView().rowHeight();}
+createCells(element){this._nameCell=null;this._initiatorCell=null;element.classList.toggle('network-error-row',this._isFailed());element.classList.toggle('network-navigation-row',this._isNavigationRequest);super.createCells(element);this._updateBackgroundColor();ProductRegistry.instance().then(productRegistry=>{if(productRegistry.entryForUrl(this._request.parsedURL)){this._isProduct=true;this._updateBackgroundColor();}});}
+_setTextAndTitle(element,text){element.createTextChild(text);element.title=text;}
+renderCell(cell,columnId){switch(columnId){case'name':this._renderNameCell(cell);break;case'method':this._setTextAndTitle(cell,this._request.requestMethod);break;case'status':this._renderStatusCell(cell);break;case'protocol':this._setTextAndTitle(cell,this._request.protocol);break;case'scheme':this._setTextAndTitle(cell,this._request.scheme);break;case'domain':this._setTextAndTitle(cell,this._request.domain);break;case'remoteaddress':this._setTextAndTitle(cell,this._request.remoteAddress());break;case'cookies':this._setTextAndTitle(cell,this._arrayLength(this._request.requestCookies));break;case'setcookies':this._setTextAndTitle(cell,this._arrayLength(this._request.responseCookies));break;case'priority':const priority=this._request.priority();this._setTextAndTitle(cell,priority?PerfUI.uiLabelForNetworkPriority(priority):'');break;case'connectionid':this._setTextAndTitle(cell,this._request.connectionId);break;case'type':this._setTextAndTitle(cell,this.displayType());break;case'initiator':this._renderInitiatorCell(cell);break;case'size':this._renderSizeCell(cell);break;case'time':this._renderTimeCell(cell);break;case'timeline':this._setTextAndTitle(cell,'');break;default:this._setTextAndTitle(cell,this._request.responseHeaderValue(columnId)||'');break;}}
+_arrayLength(array){return array?''+array.length:'';}
+select(supressSelectedEvent){super.select(supressSelectedEvent);this.parentView().dispatchEventToListeners(Network.NetworkLogView.Events.RequestSelected,this._request);}
+highlightMatchedSubstring(regexp){if(!regexp)
+return[];thi

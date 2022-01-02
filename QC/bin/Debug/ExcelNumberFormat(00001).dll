@@ -1,0 +1,537 @@
+entFormat.OpenXml.Vml.Spreadsheet.HelpButton.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.HelpButton.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.HelpButton.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.HelpButton.#ctor">
+            <summary>
+            Initializes a new instance of the HelpButton class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.HelpButton.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the HelpButton class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.HelpButton.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.CancelButton">
+            <summary>
+            <para>Cancel Button.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:Cancel.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.CancelButton.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.CancelButton.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.CancelButton.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.CancelButton.#ctor">
+            <summary>
+            Initializes a new instance of the CancelButton class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.CancelButton.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the CancelButton class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.CancelButton.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.DismissButton">
+            <summary>
+            <para>Dismiss Button.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:Dismiss.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.DismissButton.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.DismissButton.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.DismissButton.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.DismissButton.#ctor">
+            <summary>
+            Initializes a new instance of the DismissButton class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.DismissButton.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the DismissButton class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.DismissButton.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.Visible">
+            <summary>
+            <para>Comment Visibility Toggle.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:Visible.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.Visible.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.Visible.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Visible.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Visible.#ctor">
+            <summary>
+            Initializes a new instance of the Visible class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Visible.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the Visible class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Visible.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.RowHidden">
+            <summary>
+            <para>Comment's Row is Hidden.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:RowHidden.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.RowHidden.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.RowHidden.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.RowHidden.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.RowHidden.#ctor">
+            <summary>
+            Initializes a new instance of the RowHidden class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.RowHidden.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the RowHidden class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.RowHidden.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.ColumnHidden">
+            <summary>
+            <para>Comment's Column is Hidden.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:ColHidden.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.ColumnHidden.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.ColumnHidden.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.ColumnHidden.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.ColumnHidden.#ctor">
+            <summary>
+            Initializes a new instance of the ColumnHidden class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.ColumnHidden.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the ColumnHidden class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.ColumnHidden.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.MultiLine">
+            <summary>
+            <para>Multi-line.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:MultiLine.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.MultiLine.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.MultiLine.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.MultiLine.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.MultiLine.#ctor">
+            <summary>
+            Initializes a new instance of the MultiLine class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.MultiLine.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the MultiLine class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.MultiLine.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.VerticalScrollBar">
+            <summary>
+            <para>Vertical Scroll.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:VScroll.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.VerticalScrollBar.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.VerticalScrollBar.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.VerticalScrollBar.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.VerticalScrollBar.#ctor">
+            <summary>
+            Initializes a new instance of the VerticalScrollBar class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.VerticalScrollBar.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the VerticalScrollBar class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.VerticalScrollBar.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.ValidIds">
+            <summary>
+            <para>Valid ID.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:ValidIds.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.ValidIds.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.ValidIds.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.ValidIds.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.ValidIds.#ctor">
+            <summary>
+            Initializes a new instance of the ValidIds class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.ValidIds.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the ValidIds class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.ValidIds.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3DForListBoxAndDropDown">
+            <summary>
+            <para>Disable 3D.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:NoThreeD2.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3DForListBoxAndDropDown.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3DForListBoxAndDropDown.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3DForListBoxAndDropDown.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3DForListBoxAndDropDown.#ctor">
+            <summary>
+            Initializes a new instance of the Disable3DForListBoxAndDropDown class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3DForListBoxAndDropDown.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the Disable3DForListBoxAndDropDown class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3DForListBoxAndDropDown.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.Colored">
+            <summary>
+            <para>Dropdown Color Toggle.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:Colored.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.Colored.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.Colored.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Colored.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Colored.#ctor">
+            <summary>
+            Initializes a new instance of the Colored class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Colored.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the Colored class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Colored.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3D">
+            <summary>
+            <para>Disable 3D.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:NoThreeD.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3D.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3D.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3D.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3D.#ctor">
+            <summary>
+            Initializes a new instance of the Disable3D class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3D.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the Disable3D class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.Disable3D.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.FirstButton">
+            <summary>
+            <para>First Radio Button.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:FirstButton.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.FirstButton.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.FirstButton.ElementTypeId">
+            <summary>
+            Gets the type ID of the element.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.FirstButton.IsInVersion(DocumentFormat.OpenXml.FileFormatVersions)">
+            <summary>
+            Whether this element is available in a specific version of Office Application.
+            </summary>
+            <param name="version">The Office file format version.</param>
+            <returns>Returns true if the element is defined in the specified version.</returns>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.FirstButton.#ctor">
+            <summary>
+            Initializes a new instance of the FirstButton class.
+            </summary>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.FirstButton.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the FirstButton class with the specified text content.
+            </summary>
+            <param name="text">Specifies the text content of the element.</param>
+        </member>
+        <member name="M:DocumentFormat.OpenXml.Vml.Spreadsheet.FirstButton.CloneNode(System.Boolean)">
+            <summary>
+            Creates a duplicate of this node.  
+            </summary>
+            <param name="deep">True to recursively clone the subtree under the specified node; false to clone only the node itself. </param>
+            <returns>Returns the cloned node. </returns>
+        </member>
+        <member name="T:DocumentFormat.OpenXml.Vml.Spreadsheet.HorizontalScrollBar">
+            <summary>
+            <para>Scroll Bar Orientation.</para>
+            <para> When the object is serialized out as xml, its qualified name is xvml:Horiz.</para>
+            </summary>
+        </member>
+        <member name="P:DocumentFormat.OpenXml.Vml.Spreadsheet.HorizontalScrollBar.LocalName">
+            <summary>
+            Gets the local name of the element.
+            </summary>

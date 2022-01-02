@@ -1,0 +1,142 @@
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\MainWindow.g.cs
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\App.g.cs
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC_MarkupCompile.cache
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC_MarkupCompile.lref
+C:\Users\tranlequocbao\source\repos\QC\QC\bin\Debug\QC.exe.config
+C:\Users\tranlequocbao\source\repos\QC\QC\bin\Debug\QC.exe
+C:\Users\tranlequocbao\source\repos\QC\QC\bin\Debug\QC.pdb
+C:\Users\tranlequocbao\source\repos\QC\QC\bin\Debug\MaterialDesignColors.dll
+C:\Users\tranlequocbao\source\repos\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.dll
+C:\Users\tranlequocbao\source\repos\QC\QC\bin\Debug\MaterialDesignColors.pdb
+C:\Users\tranlequocbao\source\repos\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.pdb
+C:\Users\tranlequocbao\source\repos\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.xml
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\MainWindow.baml
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC.g.resources
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC.Properties.Resources.resources
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC.csproj.GenerateResource.cache
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC.csproj.CopyComplete
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC.exe
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC.pdb
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\listError.g.cs
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\listError.baml
+C:\Users\tranlequocbao\source\repos\QC\QC\obj\Debug\QC.csprojAssemblyReference.cache
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\QC.exe
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.dll
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.Wpf.dll
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.dll
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\QC.exe.config
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.exe
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.pdb
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\QC.exe
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\QC.pdb
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ClosedXML.dll
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\DocumentFormat.OpenXml.dll
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ExcelNumberFormat.dll
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.dll
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.Wpf.dll
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignColors.dll
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.dll
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ClosedXML.pdb
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ClosedXML.xml
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\DocumentFormat.OpenXml.xml
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ExcelNumberFormat.xml
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.pdb
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.xml
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.Wpf.pdb
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.Wpf.xml
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignColors.pdb
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.pdb
+E:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.xml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\ChartSection.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_Detail.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_Line.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_section.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_shop.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Detail.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\listError.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Login.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\MainWindow.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Import.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Setting.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\View_Image.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\App.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\GeneratedInternalTypeHelper.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC_MarkupCompile.cache
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC_MarkupCompile.lref
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\ChartSection.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_Detail.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_Line.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_section.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_shop.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Detail.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\listError.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Login.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\MainWindow.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Import.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Setting.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\View_Image.baml
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.g.resources
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.Properties.Resources.resources
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.csproj.GenerateResource.Cache
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.csproj.CoreCompileInputs.cache
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.csproj.CopyComplete
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\AddInfo.g.cs
+E:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\AddInfo.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\QC.exe.config
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\QC.pdb
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ClosedXML.dll
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\DocumentFormat.OpenXml.dll
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ExcelNumberFormat.dll
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignColors.dll
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ClosedXML.pdb
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ClosedXML.xml
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\DocumentFormat.OpenXml.xml
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\ExcelNumberFormat.xml
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.pdb
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.xml
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.Wpf.pdb
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\LiveCharts.Wpf.xml
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignColors.pdb
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.pdb
+D:\duan\HISTORY QC\QC PC\QC\QC\bin\Debug\MaterialDesignThemes.Wpf.xml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\AddInfo.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\ChartSection.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_Detail.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_Line.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_section.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_shop.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Detail.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\listError.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Login.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\MainWindow.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Import.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Setting.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\View_Image.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\App.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC_MarkupCompile.cache
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC_MarkupCompile.lref
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\AddInfo.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\ChartSection.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_Detail.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_Line.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_section.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Chart_shop.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Detail.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\listError.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Login.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\MainWindow.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Import.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\Setting.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\View_Image.baml
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.g.resources
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.Properties.Resources.resources
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.csproj.GenerateResource.cache
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.csproj.CoreCompileInputs.cache
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.exe
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.pdb
+D:\duan\HISTORY QC\QC PC\QC\QC\obj\Debug\QC.csproj.CopyComplete
